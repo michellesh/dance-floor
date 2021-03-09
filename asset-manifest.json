@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.css": "/dance-floor/static/css/main.6dea0f05.chunk.css",
-    "main.js": "/dance-floor/static/js/main.177816d2.chunk.js",
-    "main.js.map": "/dance-floor/static/js/main.177816d2.chunk.js.map",
+    "main.css": "/dance-floor/static/css/main.2d3c81c6.chunk.css",
+    "main.js": "/dance-floor/static/js/main.1f1f1908.chunk.js",
+    "main.js.map": "/dance-floor/static/js/main.1f1f1908.chunk.js.map",
     "runtime-main.js": "/dance-floor/static/js/runtime-main.1ff3d82a.js",
     "runtime-main.js.map": "/dance-floor/static/js/runtime-main.1ff3d82a.js.map",
-    "static/js/2.be323516.chunk.js": "/dance-floor/static/js/2.be323516.chunk.js",
-    "static/js/2.be323516.chunk.js.map": "/dance-floor/static/js/2.be323516.chunk.js.map",
+    "static/js/2.339d0957.chunk.js": "/dance-floor/static/js/2.339d0957.chunk.js",
+    "static/js/2.339d0957.chunk.js.map": "/dance-floor/static/js/2.339d0957.chunk.js.map",
     "index.html": "/dance-floor/index.html",
-    "static/css/main.6dea0f05.chunk.css.map": "/dance-floor/static/css/main.6dea0f05.chunk.css.map",
-    "static/js/2.be323516.chunk.js.LICENSE.txt": "/dance-floor/static/js/2.be323516.chunk.js.LICENSE.txt"
+    "static/css/main.2d3c81c6.chunk.css.map": "/dance-floor/static/css/main.2d3c81c6.chunk.css.map",
+    "static/js/2.339d0957.chunk.js.LICENSE.txt": "/dance-floor/static/js/2.339d0957.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.1ff3d82a.js",
-    "static/js/2.be323516.chunk.js",
-    "static/css/main.6dea0f05.chunk.css",
-    "static/js/main.177816d2.chunk.js"
+    "static/js/2.339d0957.chunk.js",
+    "static/css/main.2d3c81c6.chunk.css",
+    "static/js/main.1f1f1908.chunk.js"
   ]
 }
