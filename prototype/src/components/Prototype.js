@@ -27,6 +27,11 @@ const NUM_STRANDS = 9;
 const Canvas = styled.canvas`
   background-color: ${BACKGROUND_COLOR};
 `;
+const Container = styled.div`
+  background-color: ${BACKGROUND_COLOR};
+  height: 100%;
+  text-align: center;
+`;
 
 const leftHemisphere = [radians(180), radians(360)];
 const rightHemisphere = [radians(0), radians(180)];
@@ -181,7 +186,11 @@ const Prototype = () => {
     }
   }, [context]);
 
-  return <Canvas ref={canvasRef} width={WIDTH} height={HEIGHT} />;
+  return (
+    <Container>
+      <Canvas ref={canvasRef} width={WIDTH} height={HEIGHT} />
+    </Container>
+  );
 };
 
 export default Prototype;
