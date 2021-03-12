@@ -21,19 +21,9 @@ typedef struct test_struct {
 // Create a struct_message called myData
 test_struct myData;
 
-// Callback function that will be executed when data is received
-void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
-  memcpy(&myData, incomingData, sizeof(myData));
-  Serial.print("Bytes received: ");
-  Serial.println(len);
-  Serial.print("x: ");
-  Serial.println(myData.x);
-  Serial.print("y: ");
-  Serial.println(myData.y);
-  Serial.println();
-}
-
 void setup() {
+  pinMode(LED_BUILTIN, OUTPUT);
+
   // Initialize Serial Monitor
   Serial.begin(115200);
 
@@ -47,12 +37,31 @@ void setup() {
     return;
   }
 
+  //pinMode(ledPin, OUTPUT);
+
   // Once ESPNow is successfully Init, we will register for recv CB to
   // get recv packer info
   esp_now_set_self_role(ESP_NOW_ROLE_SLAVE);
   esp_now_register_recv_cb(OnDataRecv);
 }
 
-void loop() {
+// Callback function that will be executed when data is received
+void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
+  memcpy(&myData, incomingData, sizeof(myData));
+  Serial.print("Bytes received: ");
+  Serial.println(len);
+  Serial.print("x: ");
+  Serial.println(myData.x);
+  Serial.print("y: ");
+  Serial.println(myData.y);
+  Serial.println();
+  //digitalWrite(ledPin, HIGH);
+  digitalWrite(LED_BUILTIN, LOW);
+}
 
+void loop() {
+  //digitalWrite(LED_BUILTIN, LOW);
+  //delay(1000);
+  digitalWrite(LED_BUILTIN, HIGH);
+  //delay(2000);
 }

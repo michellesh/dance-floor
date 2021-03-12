@@ -25,6 +25,8 @@ test_struct test;
 unsigned long lastTime = 0;
 unsigned long timerDelay = 2000;  // send readings timer
 
+byte buttonPin = 0;
+
 // Callback when data is sent
 void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
   char macStr[18];
@@ -65,10 +67,12 @@ void setup() {
   esp_now_add_peer(broadcastAddress1, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
   esp_now_add_peer(broadcastAddress2, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
 
+  pinMode(buttonPin, INPUT_PULLUP);
 }
 
 void loop() {
-  if ((millis() - lastTime) > timerDelay) {
+  //if ((millis() - lastTime) > timerDelay) {
+  if (digitalRead(buttonPin) == 0) {
     // Set values to send
     test.x = random(1, 50);
     test.y = random(1, 50);
