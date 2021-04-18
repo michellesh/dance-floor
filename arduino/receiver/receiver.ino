@@ -22,8 +22,6 @@ typedef struct test_struct {
 test_struct myData;
 
 void setup() {
-  pinMode(LED_BUILTIN, OUTPUT);
-
   // Initialize Serial Monitor
   Serial.begin(115200);
 
@@ -41,6 +39,8 @@ void setup() {
   // get recv packer info
   esp_now_set_self_role(ESP_NOW_ROLE_SLAVE);
   esp_now_register_recv_cb(OnDataRecv);
+
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 // Callback function that will be executed when data is received
