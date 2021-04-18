@@ -22,10 +22,8 @@ typedef struct test_struct {
 // Create a struct_message called test to store variables to be sent
 test_struct test;
 
-unsigned long lastTime = 0;
-unsigned long timerDelay = 2000;  // send readings timer
-
 byte buttonPin = 0;
+bool buttonDown = false;
 
 // Callback when data is sent
 void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
@@ -70,16 +68,23 @@ void setup() {
   pinMode(buttonPin, INPUT_PULLUP);
 }
 
+bool isButtonPressed() {
+  return digitalRead(buttonPin) == 0;
+}
+
 void loop() {
-  //if ((millis() - lastTime) > timerDelay) {
-  if (digitalRead(buttonPin) == 0) {
-    // Set values to send
-    test.x = random(1, 50);
-    test.y = random(1, 50);
+  if (isButtonPressed()) {
+    if (!buttonDown) {
+      buttonDown = true;
 
-    // Send message via ESP-NOW
-    esp_now_send(0, (uint8_t *) &test, sizeof(test));
+      // Set values to send
+      test.x = random(1, 50);
+      test.y = random(1, 50);
 
-    lastTime = millis();
+      // Send message via ESP-NOW
+      esp_now_send(0, (uint8_t *) &test, sizeof(test));
+    }
+  } else {
+    buttonDown = false;
   }
 }

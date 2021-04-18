@@ -37,8 +37,6 @@ void setup() {
     return;
   }
 
-  //pinMode(ledPin, OUTPUT);
-
   // Once ESPNow is successfully Init, we will register for recv CB to
   // get recv packer info
   esp_now_set_self_role(ESP_NOW_ROLE_SLAVE);
@@ -55,13 +53,8 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
   Serial.print("y: ");
   Serial.println(myData.y);
   Serial.println();
-  //digitalWrite(ledPin, HIGH);
-  digitalWrite(LED_BUILTIN, LOW);
 }
 
 void loop() {
-  //digitalWrite(LED_BUILTIN, LOW);
-  //delay(1000);
-  digitalWrite(LED_BUILTIN, HIGH);
-  //delay(2000);
+
 }
