@@ -1,4 +1,4 @@
-#include "WiFiCredentials.h"
+#include "secrets.h"
 #include <SPI.h>
 #include <ESP8266WiFi.h>
 
