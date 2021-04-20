@@ -1,5 +1,13 @@
 import { getCanvasDimensions } from 'utils';
 
+export const getCenterCoords = (context, strands) => {
+  const { width } = getCanvasDimensions(context);
+  return {
+    x: width / 2,
+    y: strands[0][0].y
+  };
+};
+
 export const showLEDs = (context, leds) => {
   const { width, height } = getCanvasDimensions(context);
   context.clearRect(0, 0, width, height);
@@ -17,3 +25,4 @@ export const showStrands = (context, strands) => {
 
 export * from './fan';
 export * from './ripple';
+export * from './windsheild';

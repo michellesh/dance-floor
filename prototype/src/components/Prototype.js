@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import * as d3 from 'd3';
 import { isEqual, reverse } from 'lodash';
 
-import { ripple } from 'animations';
+import * as animations from 'animations';
 import { useCanvas } from 'hooks';
 import {
   angleBetween,
@@ -15,6 +15,8 @@ import {
   radians
 } from 'utils';
 
+window.d3 = d3;
+
 const WIDTH = 1100;
 const HEIGHT = 900;
 const RADIUS_X = 100;
@@ -22,7 +24,7 @@ const SAIL_COLOR = '#455B68';
 const BACKGROUND_COLOR = 'black';
 const LED_COLOR = 'white';
 const LED_DENSITY = 165;
-const NUM_STRANDS = 9;
+const NUM_STRANDS = 7;
 
 const Canvas = styled.canvas`
   background-color: ${BACKGROUND_COLOR};
@@ -148,6 +150,12 @@ const Sail = config => {
 
 const SAILS = [
   {
+    p1: { x: -60, y: 300 },
+    p2: { x: 880, y: 550 },
+    p3: { x: -60, y: 800 },
+    rx: RADIUS_X
+  },
+  {
     p1: { x: 300, y: -100 },
     p2: { x: 750, y: 750 },
     p3: { x: -100, y: 300 },
@@ -157,12 +165,6 @@ const SAILS = [
     p1: { x: WIDTH + 100, y: 300 },
     p2: { x: WIDTH - 750, y: 750 },
     p3: { x: WIDTH - 300, y: -100 },
-    rx: RADIUS_X
-  },
-  {
-    p1: { x: -60, y: 300 },
-    p2: { x: 880, y: 550 },
-    p3: { x: -60, y: 800 },
     rx: RADIUS_X
   },
   {
@@ -181,8 +183,14 @@ const Prototype = () => {
 
   useEffect(() => {
     if (context) {
+      // This colors in the background of the sail. Ignore for now
       //SAILS.forEach(sail => sail.draw(context));
-      ripple(context, STRANDS);
+
+      // Animation
+      animations.windshield(context, STRANDS);
+
+      // No animation
+      //animations.showStrands(context, STRANDS);
     }
   }, [context]);
 

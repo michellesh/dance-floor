@@ -8,6 +8,17 @@ export const degrees = radians => (180 * (radians + OFFSET)) / Math.PI;
 export const distance = (p1, p2) =>
   Math.sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
 
+export const last = (arr = []) => arr[arr.length - 1];
+
+export const pointOnCircumference = (radius, origin, d) => {
+  const degrees = d - 90 < 0 ? d + 270 : d - 90;
+  const radians = (degrees * Math.PI) / 180;
+  return {
+    x: origin.x + radius * Math.cos(radians),
+    y: origin.y + radius * Math.sin(radians)
+  };
+};
+
 // get a point along the line that forms between p1 and p2
 // howFar value between 0 and 1, how far along that line
 export const pointOnLine = (p1, p2, howFar) => ({
@@ -54,9 +65,4 @@ export const isPointInsideTriangle = (pt, v1, v2, v3) => {
 
 export const radians = degrees => (degrees * Math.PI) / 180 - OFFSET;
 
-export const getCanvasDimensions = context => {
-  if (context) {
-    const { width, height } = context.canvas.getBoundingClientRect();
-    return { width, height };
-  }
-};
+export * from './canvas';
