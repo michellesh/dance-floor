@@ -14,23 +14,16 @@
 
 // Structure example to send data
 // Must match the receiver structure
-typedef struct led {
-  uint8_t x;
-  uint8_t y;
-  uint8_t r;
-  uint8_t g;
-  uint8_t b;
-  uint8_t a;
-} led;
+typedef struct test_struct {
+    int x;
+    int y;
+} test_struct;
 
 // Create a struct_message called test to store variables to be sent
-led test;
+test_struct test;
 
 byte buttonPin = 0;
 bool buttonDown = false;
-
-unsigned long lastTime = 0;
-unsigned long timerDelay = 2000;  // send readings timer
 
 void setup() {
   // Init Serial Monitor
@@ -49,10 +42,8 @@ void setup() {
   esp_now_set_self_role(ESP_NOW_ROLE_CONTROLLER);
 
   // Register peers
-  //esp_now_add_peer(broadcastAddress1, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
+  esp_now_add_peer(broadcastAddress1, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
   esp_now_add_peer(broadcastAddress2, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
-  esp_now_add_peer(broadcastAddress3, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
-  esp_now_add_peer(broadcastAddress4, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
 
   pinMode(buttonPin, INPUT_PULLUP);
 }
@@ -62,30 +53,18 @@ bool isButtonPressed() {
 }
 
 void loop() {
-  if ((millis() - lastTime) > timerDelay) {
-    // Set values to send
-    test.x = random(1, 5);
-    test.y = random(1, 5);
-    test.r = random(0, 255);
-    test.g = random(0, 255);
-    test.b = random(0, 255);
-    test.a = random(0, 255);
-    Serial.print(test.x);
-    Serial.print(", ");
-    Serial.print(test.y);
-    Serial.print(" (");
-    Serial.print(test.r);
-    Serial.print(" ");
-    Serial.print(test.g);
-    Serial.print(" ");
-    Serial.print(test.b);
-    Serial.print(") ");
-    Serial.print(test.a);
-    Serial.println();
+  if (isButtonPressed()) {
+    if (!buttonDown) {
+      buttonDown = true;
 
-    // Send message via ESP-NOW
-    esp_now_send(0, (uint8_t *) &test, sizeof(test));
+      // Set values to send
+      test.x = random(1, 50);
+      test.y = random(1, 50);
 
-    lastTime = millis();
+      // Send message via ESP-NOW
+      esp_now_send(0, (uint8_t *) &test, sizeof(test));
+    }
+  } else {
+    buttonDown = false;
   }
 }
