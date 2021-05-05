@@ -4,64 +4,86 @@
 #include <FastLED.h>
 #include <espnow.h>
 
-#define DATA_PIN    2
-#define LED_TYPE    WS2813
-#define COLOR_ORDER GRB
-#define NUM_LEDS    5
-#define BRIGHTNESS  255
-CRGB leds[NUM_LEDS];
+#define DATA_PIN_2  2
+#define DATA_PIN_3  3
+#define DATA_PIN_4  4
+#define DATA_PIN_5  5
+#define DATA_PIN_6  6
+#define DATA_PIN_7  7
+#define DATA_PIN_8  8
+
+#define BRIGHTNESS   255
+#define COLOR_ORDER  GRB
+#define LED_TYPE     WS2813
+#define NUM_LEDS     150     // TODO will depend on strand
+#define NUM_PINS     7
+#define NUM_STRIPS   28
+
+#define VIZ_DEFAULT     0
+#define VIZ_WINDSHIELD  1
+
+CRGB leds[NUM_STRIPS][NUM_LEDS];
+
+CRGB BLACK = CRGB(0, 0, 0);
+CRGB WHITE = CRGB(255, 255, 255);
+CRGB RED = CRGB(255, 0, 0);
+CRGB BLUE = CRGB(0, 0, 255);
 
 // Structure example to receive data
 // Must match the sender structure
-typedef struct led {
-  uint8_t x;
-  uint8_t y;
-  uint8_t r;
-  uint8_t g;
-  uint8_t b;
-  uint8_t a;
-} led;
+typedef struct msg {
+  uint8_t viz;
+} msg;
 
-// Create a struct_message called myData
-led myData;
+msg myData;
 
-int boardNumber;
-int x = -1;
-int y = -1;
-uint8_t r = 0;
-uint8_t g = 0;
-uint8_t b = 0;
+uint8_t boardNumber;
+uint8_t offset;
+uint8_t viz = VIZ_DEFAULT;
 
 void setup() {
-  // Initialize Serial Monitor
   Serial.begin(115200);
   delay(500);
 
-  // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
 
-  // Init ESP-NOW
   if (esp_now_init() != 0) {
     Serial.println("Error initializing ESP-NOW");
     return;
   }
 
-  // Once ESPNow is successfully Init, we will register for recv CB to
-  // get recv packer info
   esp_now_set_self_role(ESP_NOW_ROLE_SLAVE);
   esp_now_register_recv_cb(OnDataRecv);
-
-  pinMode(LED_BUILTIN, OUTPUT);
 
   boardNumber = WiFi.macAddress() == macAddress1   ? 1
                 : WiFi.macAddress() == macAddress2 ? 2
                 : WiFi.macAddress() == macAddress3 ? 3
                                                    : 4;
+  offset = (boardNumber - 1) * NUM_PINS;
 
-  FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS)
+  FastLED.addLeds<LED_TYPE, DATA_PIN_2, COLOR_ORDER>(leds[offset], NUM_LEDS)
     .setCorrection(TypicalLEDStrip)
     .setDither(BRIGHTNESS < 255);
+  FastLED.addLeds<LED_TYPE, DATA_PIN_3, COLOR_ORDER>(leds[offset + 1], NUM_LEDS)
+    .setCorrection(TypicalLEDStrip)
+    .setDither(BRIGHTNESS < 255);
+  FastLED.addLeds<LED_TYPE, DATA_PIN_4, COLOR_ORDER>(leds[offset + 2], NUM_LEDS)
+    .setCorrection(TypicalLEDStrip)
+    .setDither(BRIGHTNESS < 255);
+  FastLED.addLeds<LED_TYPE, DATA_PIN_5, COLOR_ORDER>(leds[offset + 3], NUM_LEDS)
+    .setCorrection(TypicalLEDStrip)
+    .setDither(BRIGHTNESS < 255);
+  FastLED.addLeds<LED_TYPE, DATA_PIN_6, COLOR_ORDER>(leds[offset + 4], NUM_LEDS)
+    .setCorrection(TypicalLEDStrip)
+    .setDither(BRIGHTNESS < 255);
+  FastLED.addLeds<LED_TYPE, DATA_PIN_7, COLOR_ORDER>(leds[offset + 5], NUM_LEDS)
+    .setCorrection(TypicalLEDStrip)
+    .setDither(BRIGHTNESS < 255);
+  FastLED.addLeds<LED_TYPE, DATA_PIN_8, COLOR_ORDER>(leds[offset + 6], NUM_LEDS)
+    .setCorrection(TypicalLEDStrip)
+    .setDither(BRIGHTNESS < 255);
+
   FastLED.setBrightness(BRIGHTNESS);
 }
 
@@ -71,37 +93,46 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
   Serial.print("Bytes received: ");
   Serial.println(len);
 
-  Serial.print("x: ");
-  Serial.print(myData.x);
-  Serial.print(" y: ");
-  Serial.print(myData.y);
-  Serial.print(" R:");
-  Serial.print(myData.r);
-  Serial.print(" G:");
-  Serial.print(myData.g);
-  Serial.print(" B:");
-  Serial.print(myData.b);
-  Serial.print(" a:");
-  Serial.print(myData.a);
-  Serial.println();
-
-  x = myData.x;
-  y = myData.y;
-  r = myData.r;
-  g = myData.g;
-  b = myData.b;
+  viz = myData.viz;
 }
 
-void set_all_black() {
-  for(uint16_t i = 0; i < NUM_LEDS; i++) {
-    leds[i] = CRGB(0,0,0);
+void set_all(CRGB color, uint8_t num_leds = NUM_LEDS) {
+  for (uint16_t i = 0; i < NUM_STRIPS; i++) {
+    for (uint16_t j = 0; j < num_leds; j++) {
+      leds[i][j] = color;
+    }
   }
+}
+
+void set_strip(uint8_t strip_number, CRGB color, uint8_t num_leds = NUM_LEDS) {
+  for (uint16_t j = 0; j < num_leds; j++) {
+    leds[strip_number][j] = color;
+  }
+}
+
+void viz_default() {
+  set_all(RED);
+  FastLED.show();
+}
+
+void viz_windshield() {
+  set_all(BLACK);
+  for (uint8_t s = 0; s < NUM_STRIPS; s++) {
+    set_strip(s, BLUE);
+    FastLED.show();
+    set_strip(s, BLACK);
+  }
+  FastLED.show();
 }
 
 void loop() {
-  set_all_black();
-  if (x == boardNumber) {
-    leds[y] = CRGB(r, g, b);
+  switch (viz) {
+    case VIZ_WINDSHIELD:
+      viz_windshield();
+      viz = VIZ_DEFAULT;
+      break;
+    default:
+      viz_default();
+      break;
   }
-  FastLED.show();
 }
