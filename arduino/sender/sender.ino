@@ -3,7 +3,8 @@
 #include <espnow.h>
 
 #define VIZ_DEFAULT     0
-#define VIZ_WINDSHIELD  1
+#define VIZ_PRIDE       1
+#define VIZ_WINDSHIELD  2
 
 typedef struct msg {
   uint8_t viz;
@@ -47,7 +48,7 @@ void loop() {
     if (!buttonDown) {
       buttonDown = true;
 
-      test.viz = VIZ_WINDSHIELD;
+      test.viz = VIZ_PRIDE;
 
       esp_now_send(0, (uint8_t *) &test, sizeof(test));
     }
