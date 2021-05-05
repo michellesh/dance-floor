@@ -111,7 +111,7 @@ void set_strip(uint8_t strip_number, CRGB color, uint8_t num_leds = NUM_LEDS) {
 }
 
 void viz_default() {
-  set_all(RED);
+  set_all(BLACK);
   FastLED.show();
 }
 
