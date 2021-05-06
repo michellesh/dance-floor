@@ -40,6 +40,7 @@ msg myData;
 
 uint8_t boardNumber;
 uint8_t offset;
+uint8_t sw = NUM_STRIPS;
 uint8_t viz = VIZ_DEFAULT;
 
 void setup() {
@@ -95,6 +96,9 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
   Serial.println(len);
 
   viz = myData.viz;
+  if (viz == VIZ_WINDSHIELD) {
+    sw = 0;
+  }
 }
 
 void set_all(CRGB color, uint8_t num_leds = NUM_LEDS) {
@@ -120,10 +124,7 @@ void viz_windshield() {
   set_all(BLACK);
   for (uint8_t s = 0; s < NUM_STRIPS; s++) {
     set_strip(s, BLUE);
-    FastLED.show();
-    set_strip(s, BLACK);
   }
-  FastLED.show();
 }
 
 // Adapted code from https://create.arduino.cc/projecthub/Mukesh_Sankhla/rgb-hexmatrix-iot-clock-54fc5d
@@ -164,20 +165,15 @@ void viz_pride() {
     uint16_t strandnumber = pixelnumber / NUM_LEDS;
     nblend(leds[strandnumber][pixelnumber - (strandnumber * NUM_LEDS)], newcolor, 64);
   }
-  FastLED.show();
 }
 
 void loop() {
-  switch (viz) {
-    case VIZ_PRIDE:
-      viz_pride();
-      break;
-    case VIZ_WINDSHIELD:
-      viz_windshield();
-      viz = VIZ_DEFAULT;
-      break;
-    default:
-      viz_default();
-      break;
+  viz_pride();
+
+  if (sw < NUM_STRIPS) {
+    set_strip(sw, WHITE);
+    sw += 1;
   }
+
+  FastLED.show();
 }

@@ -48,7 +48,7 @@ void loop() {
     if (!buttonDown) {
       buttonDown = true;
 
-      test.viz = VIZ_PRIDE;
+      test.viz = VIZ_WINDSHIELD;
 
       esp_now_send(0, (uint8_t *) &test, sizeof(test));
     }
