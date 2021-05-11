@@ -8,6 +8,8 @@ import { useCanvas } from 'hooks';
 import {
   angleBetween,
   distance,
+  drawDot,
+  drawLine,
   pointOnEllipse,
   pointOnLine,
   radians
@@ -23,9 +25,12 @@ const BACKGROUND_COLOR = 'black';
 const LED_COLOR = 'white';
 const LED_DENSITY = 165;
 const NUM_STRANDS = 7;
+const NUM_LEDS = 150;
 
 const Canvas = styled.canvas`
   background-color: ${BACKGROUND_COLOR};
+  background-image: url(${process.env.PUBLIC_URL}/img/sail_layout.png);
+  background-size: ${WIDTH}px ${HEIGHT}px;
 `;
 const Container = styled.div`
   background-color: ${BACKGROUND_COLOR};
@@ -180,7 +185,59 @@ const SAILS = [
   }
 ].map(s => Sail(s).setNumStrands(NUM_STRANDS));
 
-const SAIL_STRANDS = SAILS.map(sail => sail.getLEDs().map(leds => leds));
+const Triangle = config => {
+  const { p1, p2, p3, color } = config;
+  const lines = d3
+    .range(0, NUM_STRANDS)
+    .map(i => ({ p1: p2, p2: pointOnLine(p3, p1, i / (NUM_STRANDS - 1)) }));
+  const _triangle = { ...config, lines };
+  return Object.freeze({
+    ..._triangle,
+    getLEDs: () =>
+      d3.range(0, NUM_STRANDS).map(i => {
+        const pInc = pointOnLine(p3, p1, i / (NUM_STRANDS - 1));
+        return d3
+          .range(0, NUM_LEDS)
+          .map(j => LED(pointOnLine(p2, pInc, j / (NUM_LEDS - 1))));
+      }),
+    draw: context => {
+      drawDot(context, p1, 2, 'red');
+      drawDot(context, p2, 2, 'green');
+      drawDot(context, p3, 2, 'yellow');
+      lines.forEach(line => drawLine(context, line.p1, line.p2, color));
+    }
+  });
+};
+
+const TRIANGLES = [
+  {
+    p1: { x: 80, y: 500 },
+    p2: { x: 400, y: 795 },
+    p3: { x: 50, y: 850 },
+    color: 'red'
+  },
+  {
+    p1: { x: 410, y: 100 },
+    p2: { x: 470, y: 650 },
+    p3: { x: 90, y: 325 },
+    color: 'orange'
+  },
+  {
+    p1: { x: 1000, y: 325 },
+    p2: { x: 630, y: 650 },
+    p3: { x: 690, y: 100 },
+    color: 'green'
+  },
+  {
+    p1: { x: 1050, y: 850 },
+    p2: { x: 700, y: 795 },
+    p3: { x: 1020, y: 500 },
+    color: 'blue'
+  }
+].map(t => Triangle(t));
+
+//const SAIL_STRANDS = SAILS.map(sail => sail.getLEDs().map(leds => leds));
+const SAIL_STRANDS = TRIANGLES.map(tri => tri.getLEDs().map(leds => leds));
 const STRANDS = SAIL_STRANDS.flatMap(sailStrand => sailStrand);
 
 const Prototype = () => {
@@ -189,7 +246,8 @@ const Prototype = () => {
   useEffect(() => {
     if (context) {
       // This colors in the background of the sail. Ignore for now
-      SAILS.forEach(sail => sail.draw(context));
+      //SAILS.forEach(sail => sail.draw(context));
+      TRIANGLES.forEach(tri => tri.draw(context));
 
       // Draw LEDs only
       STRANDS.forEach(strand => strand.forEach(led => led.draw(context)));
