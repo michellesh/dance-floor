@@ -1,27 +1,5 @@
-/*
- * Everything needed to calculate the XY coordinates of each LED
+/* Everything needed to calculate the XY coordinates of each LED
  */
-#define NUM_LEDS     150
-#define NUM_PINS     7
-#define NUM_STRIPS   28
-
-#define HEIGHT       900
-#define NUM_STRANDS  7
-#define RADIUS_X     100
-#define WIDTH        1100
-#define STRIP_START  0.3
-
-struct XY {
-  float x;
-  float y;
-};
-
-struct Sail {
-  XY p1;
-  XY p2;
-  XY p3;
-};
-
 Sail sail1 = {{80, 500}, {400, 795}, {50, 850}};
 Sail sail2 = {{410, 100}, {470, 650}, {90, 325}};
 Sail sail3 = {{1000, 325}, {630, 650}, {690, 100}};
@@ -54,7 +32,7 @@ XY ledxy(int i, int j) {
 // on the fly ends up slowing down the visualizations
 XY ledxy[NUM_STRIPS][NUM_LEDS];
 
-void getSailLEDs(int startIndex, Sail sail) {
+void setSailLEDs(int startIndex, Sail sail) {
   for (int i = 0; i < NUM_STRANDS; i++) {
     XY pInc = pointOnLine(sail.p3, sail.p1, (float)i / (NUM_STRANDS - 1));
     for (int j = 0; j < NUM_LEDS; j++) {
@@ -64,9 +42,9 @@ void getSailLEDs(int startIndex, Sail sail) {
 }
 
 void getLEDxy() {
-  getSailLEDs(0, {{80, 500}, {400, 795}, {50, 850}}); // sail 1
-  getSailLEDs(NUM_STRANDS, {{410, 100}, {470, 650}, {90, 325}}); // sail 2
-  getSailLEDs(NUM_STRANDS * 2, {{1000, 325}, {630, 650}, {690, 100}}); // sail 3
-  getSailLEDs(NUM_STRANDS * 3, {{1050, 850}, {700, 795}, {1020, 500}}); // sail 4
+  setSailLEDs(0, {{80, 500}, {400, 795}, {50, 850}}); // sail 1
+  setSailLEDs(NUM_STRANDS, {{410, 100}, {470, 650}, {90, 325}}); // sail 2
+  setSailLEDs(NUM_STRANDS * 2, {{1000, 325}, {630, 650}, {690, 100}}); // sail 3
+  setSailLEDs(NUM_STRANDS * 3, {{1050, 850}, {700, 795}, {1020, 500}}); // sail 4
 }
 */
