@@ -8,8 +8,6 @@ import { useCanvas } from 'hooks';
 import {
   angleBetween,
   distance,
-  isPointInsideEllipse,
-  isPointInsideTriangle,
   pointOnEllipse,
   pointOnLine,
   radians
@@ -35,8 +33,6 @@ const Container = styled.div`
   text-align: center;
 `;
 
-const leftHemisphere = [radians(180), radians(360)];
-const rightHemisphere = [radians(0), radians(180)];
 const Ellipse = (
   p1,
   p2,
@@ -96,7 +92,15 @@ const LED = config => {
 };
 
 const Sail = config => {
-  const { p1, p2, p3, rx, numStrands } = config;
+  const {
+    p1,
+    p2,
+    p3,
+    rx,
+    numStrands,
+    rightHemisphere,
+    leftHemisphere
+  } = config;
   const ellipses = d3.range(0, numStrands).map(i => {
     const incAmount = rx / (numStrands - 1);
     const pInc = pointOnLine(p3, p1, i / (numStrands - 1));
@@ -121,14 +125,7 @@ const Sail = config => {
           const angleStep = (e.endAngle - e.startAngle) / LED_DENSITY;
           const leds = d3
             .range(e.startAngle, e.endAngle, angleStep)
-            .map(angle => LED(pointOnEllipse(e, angle)))
-            .filter(
-              led =>
-                isPointInsideTriangle(led, p1, p2, p3) &&
-                [_sail.e1.pad(), _sail.e2.pad(), _sail.e3].every(
-                  e => !isPointInsideEllipse(e, led)
-                )
-            );
+            .map(angle => LED(pointOnEllipse(e, angle)));
           return isEqual([e.startAngle, e.endAngle], rightHemisphere)
             ? reverse(leds)
             : leds;
@@ -153,25 +150,33 @@ const SAILS = [
     p1: { x: -60, y: 300 },
     p2: { x: 880, y: 550 },
     p3: { x: -60, y: 800 },
-    rx: RADIUS_X
+    rx: RADIUS_X,
+    leftHemisphere: [radians(260), radians(320)],
+    rightHemisphere: [radians(40), radians(100)]
   },
   {
     p1: { x: 300, y: -100 },
     p2: { x: 750, y: 750 },
     p3: { x: -100, y: 300 },
-    rx: RADIUS_X
+    rx: RADIUS_X,
+    leftHemisphere: [radians(255), radians(320)],
+    rightHemisphere: [radians(40), radians(105)]
   },
   {
     p1: { x: WIDTH + 100, y: 300 },
     p2: { x: WIDTH - 750, y: 750 },
     p3: { x: WIDTH - 300, y: -100 },
-    rx: RADIUS_X
+    rx: RADIUS_X,
+    leftHemisphere: [radians(255), radians(320)],
+    rightHemisphere: [radians(40), radians(105)]
   },
   {
     p1: { x: WIDTH + 60, y: 800 },
     p2: { x: WIDTH - 880, y: 550 },
     p3: { x: WIDTH + 60, y: 300 },
-    rx: RADIUS_X
+    rx: RADIUS_X,
+    leftHemisphere: [radians(260), radians(320)],
+    rightHemisphere: [radians(40), radians(100)]
   }
 ].map(s => Sail(s).setNumStrands(NUM_STRANDS));
 
@@ -184,10 +189,13 @@ const Prototype = () => {
   useEffect(() => {
     if (context) {
       // This colors in the background of the sail. Ignore for now
-      //SAILS.forEach(sail => sail.draw(context));
+      SAILS.forEach(sail => sail.draw(context));
+
+      // Draw LEDs only
+      STRANDS.forEach(strand => strand.forEach(led => led.draw(context)));
 
       // Animation
-      animations.windshield(context, STRANDS);
+      //animations.windshield(context, STRANDS);
 
       // No animation
       //animations.showStrands(context, STRANDS);
