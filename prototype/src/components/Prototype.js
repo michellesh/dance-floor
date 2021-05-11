@@ -29,8 +29,8 @@ const NUM_LEDS = 150;
 
 const Canvas = styled.canvas`
   background-color: ${BACKGROUND_COLOR};
-  background-image: url(${process.env.PUBLIC_URL}/img/sail_layout.png);
-  background-size: ${WIDTH}px ${HEIGHT}px;
+  //background-image: url(${process.env.PUBLIC_URL}/img/sail_layout.png);
+  //background-size: ${WIDTH}px ${HEIGHT}px;
 `;
 const Container = styled.div`
   background-color: ${BACKGROUND_COLOR};
