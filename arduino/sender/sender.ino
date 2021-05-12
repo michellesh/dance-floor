@@ -2,12 +2,19 @@
 #include <ESP8266WiFi.h>
 #include <espnow.h>
 
+#define NUM_LEDS        150     // TODO will depend on strand
+#define NUM_STRIPS      28
+#define STRIPS_PER_SAIL 7
+
 #define VIZ_DEFAULT     0
 #define VIZ_PRIDE       1
 #define VIZ_WINDSHIELD  2
+#define VIZ_RIPPLE      3
 
 typedef struct msg {
   uint8_t viz;
+  int i;
+  int j;
 } msg;
 
 msg test;
@@ -48,7 +55,9 @@ void loop() {
     if (!buttonDown) {
       buttonDown = true;
 
-      test.viz = VIZ_WINDSHIELD;
+      test.viz = VIZ_RIPPLE;
+      test.i = random(1, STRIPS_PER_SAIL - 1);
+      test.j = random(1, NUM_LEDS - 1);
 
       esp_now_send(0, (uint8_t *) &test, sizeof(test));
     }

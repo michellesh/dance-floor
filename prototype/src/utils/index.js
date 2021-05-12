@@ -65,4 +65,6 @@ export const isPointInsideTriangle = (pt, v1, v2, v3) => {
 
 export const radians = degrees => (degrees * Math.PI) / 180 - OFFSET;
 
+export const random = (min, max) => min + Math.floor(Math.random() * (max - min));
+
 export * from './canvas';

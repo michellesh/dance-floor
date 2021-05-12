@@ -17,12 +17,12 @@ XY pointOnLine(XY p1, XY p2, float howFar) {
 // where i is the index of the strand
 // and j is the index of the led on the strand
 XY ledxy(int i, int j) {
-  Sail sail = i >= 0 && i < NUM_STRANDS                     ? sail1
-              : i >= NUM_STRANDS && i < NUM_STRANDS * 2     ? sail2
-              : i >= NUM_STRANDS * 2 && i < NUM_STRANDS * 3 ? sail3
-                                                            : sail4;
-  int iSail = i - NUM_STRANDS * (i % NUM_STRANDS);
-  XY pInc = pointOnLine(sail.p3, sail.p1, (float)iSail / (NUM_STRANDS - 1));
+  Sail sail = i >= 0 && i < STRIPS_PER_SAIL                         ? sail1
+              : i >= STRIPS_PER_SAIL && i < STRIPS_PER_SAIL * 2     ? sail2
+              : i >= STRIPS_PER_SAIL * 2 && i < STRIPS_PER_SAIL * 3 ? sail3
+                                                                    : sail4;
+  int iSail = i - STRIPS_PER_SAIL * (i % STRIPS_PER_SAIL);
+  XY pInc = pointOnLine(sail.p3, sail.p1, (float)iSail / (STRIPS_PER_SAIL - 1));
   return pointOnLine(sail.p2, pInc, (float)j / (NUM_LEDS - 1));
 }
 
@@ -33,8 +33,8 @@ XY ledxy(int i, int j) {
 XY ledxy[NUM_STRIPS][NUM_LEDS];
 
 void setSailLEDs(int startIndex, Sail sail) {
-  for (int i = 0; i < NUM_STRANDS; i++) {
-    XY pInc = pointOnLine(sail.p3, sail.p1, (float)i / (NUM_STRANDS - 1));
+  for (int i = 0; i < STRIPS_PER_SAIL; i++) {
+    XY pInc = pointOnLine(sail.p3, sail.p1, (float)i / (STRIPS_PER_SAIL - 1));
     for (int j = 0; j < NUM_LEDS; j++) {
       ledxy[i + startIndex][j] = pointOnLine(sail.p2, pInc, (float)j / (NUM_LEDS - 1));
     }
@@ -43,8 +43,8 @@ void setSailLEDs(int startIndex, Sail sail) {
 
 void getLEDxy() {
   setSailLEDs(0, {{80, 500}, {400, 795}, {50, 850}}); // sail 1
-  setSailLEDs(NUM_STRANDS, {{410, 100}, {470, 650}, {90, 325}}); // sail 2
-  setSailLEDs(NUM_STRANDS * 2, {{1000, 325}, {630, 650}, {690, 100}}); // sail 3
-  setSailLEDs(NUM_STRANDS * 3, {{1050, 850}, {700, 795}, {1020, 500}}); // sail 4
+  setSailLEDs(STRIPS_PER_SAIL, {{410, 100}, {470, 650}, {90, 325}}); // sail 2
+  setSailLEDs(STRIPS_PER_SAIL * 2, {{1000, 325}, {630, 650}, {690, 100}}); // sail 3
+  setSailLEDs(STRIPS_PER_SAIL * 3, {{1050, 850}, {700, 795}, {1020, 500}}); // sail 4
 }
 */

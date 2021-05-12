@@ -1,7 +1,48 @@
 import * as d3 from 'd3';
 
-import { distance, getCanvasDimensions } from 'utils';
-import { showLEDs } from 'animations';
+import { distance, getCanvasDimensions, random } from 'utils';
+import { showLEDs, showStrands } from 'animations';
+
+export const rippleEffect = (context, strands) => {
+  const { width, height } = getCanvasDimensions(context);
+  const RIPPLE_WIDTH = 50;
+  const DAMPENING = 0.99;
+
+  let current = d3
+    .range(0, strands.length)
+    .map(() => d3.range(0, strands[0].length).map(() => 0));
+  let previous = d3
+    .range(0, strands.length)
+    .map(() => d3.range(0, strands[0].length).map(() => 0));
+
+  const x = random(1, strands.length - 1);
+  const y = random(1, strands[0].length - 1);
+  current[x][y] = 5;
+
+  const _rippleEffect = () => {
+    for (let i = 1; i < strands.length - 1; i++) {
+      for (let j = 1; j < strands[0].length - 1; j++) {
+        current[i][j] =
+          (previous[i - 1][j] +
+            previous[i + 1][j] +
+            previous[i][j - 1] +
+            previous[i][j + 1]) /
+            2 -
+          current[i][j];
+        current[i][j] = current[i][j] * DAMPENING;
+        const radius = current[i][j] < 0 ? 0 : current[i][j];
+        strands[i][j] = strands[i][j].radius(1 + radius * 10);
+      }
+    }
+    showStrands(context, strands);
+    const temp = previous;
+    previous = current;
+    current = temp;
+    window.requestAnimationFrame(_rippleEffect);
+  };
+
+  window.requestAnimationFrame(_rippleEffect);
+};
 
 export const ripple = (context, strands) => {
   const { width, height } = getCanvasDimensions(context);

@@ -1,4 +1,4 @@
-/* Visualizations
+/* Pride visualization
  */
 void viz_pride() {
   static uint16_t sPseudotime = 0;

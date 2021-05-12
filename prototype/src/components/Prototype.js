@@ -253,7 +253,7 @@ const Prototype = () => {
       STRANDS.forEach(strand => strand.forEach(led => led.draw(context)));
 
       // Animation
-      //animations.windshield(context, STRANDS);
+      animations.rippleEffect(context, STRANDS);
 
       // No animation
       //animations.showStrands(context, STRANDS);
