@@ -29,6 +29,8 @@
 #define VIZ_WINDSHIELD  2
 #define VIZ_RIPPLE      3
 
+#define SECONDS_PER_PALETTE  30
+
 typedef struct XY {
   float x;
   float y;
@@ -56,9 +58,11 @@ uint8_t offset;
 uint8_t stripIndex = NUM_STRIPS;
 uint8_t viz = VIZ_DEFAULT;
 
-float current[STRIPS_PER_SAIL][NUM_LEDS];
-float previous[STRIPS_PER_SAIL][NUM_LEDS];
-float temp[STRIPS_PER_SAIL][NUM_LEDS];
+int16_t current[NUM_STRIPS][NUM_LEDS];
+int16_t previous[NUM_STRIPS][NUM_LEDS];
+
+CRGBPalette16 gCurrentPalette;
+CRGBPalette16 gTargetPalette;
 
 void setup() {
   Serial.begin(115200);
@@ -105,12 +109,14 @@ void setup() {
 
   FastLED.setBrightness(BRIGHTNESS);
 
-  for(int i = 0; i < STRIPS_PER_SAIL; i++) {
+  for(int i = 0; i < NUM_STRIPS; i++) {
     for(int j = 0; j < NUM_LEDS; j++) {
-      current[i][j] = 0.0;
-      previous[i][j] = 0.0;
+      current[i][j] = 0;
+      previous[i][j] = 0;
     }
   }
+
+  chooseNextColorPalette(gTargetPalette);
 }
 
 void set_all(CRGB color) {
@@ -136,8 +142,16 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
     Serial.println(myData.i);
     Serial.print("j: ");
     Serial.println(myData.j);
-    current[(int)myData.i][(int)myData.j] = 255.0;
+    current[(int)myData.i][(int)myData.j] = 500;
   }
+}
+
+int geti(int pixelnumber) {
+  return pixelnumber / NUM_LEDS;
+}
+
+int getj(int pixelnumber) {
+  return pixelnumber - (geti(pixelnumber) * NUM_LEDS);
 }
 
 void set_strip(uint8_t strip_number, CRGB color, uint8_t num_leds = NUM_LEDS) {
@@ -157,15 +171,52 @@ auto scale(float domainStart, float domainEnd, float rangeStart, float rangeEnd)
   };
 }
 
+uint8_t gHue = 0;
+void bpm() {
+  // colored stripes pulsing at a defined Beats-Per-Minute (BPM)
+  uint8_t BeatsPerMinute = 62;
+  CRGBPalette16 palette = PartyColors_p;
+  uint8_t beat = beatsin8( BeatsPerMinute, 64, 255);
+  for( int i = 0; i < NUM_STRIPS * NUM_LEDS; i++) { //9948
+    leds[geti(i)][getj(i)] = ColorFromPalette(palette, gHue+(i*2), beat-gHue+(i*10));
+  }
+}
+
+void juggle() {
+  // eight colored dots, weaving in and out of sync with each other
+  for (int i = 0; i < NUM_STRIPS; i++) {
+    fadeToBlackBy( leds[i], NUM_LEDS, 20);
+  }
+  uint8_t dothue = 0;
+  for( int i = 0; i < NUM_STRIPS; i++) {
+    for( int j = 0; j < 8; j++) {
+      leds[i][beatsin16( j+7, 0, NUM_LEDS-1 )] |= CHSV(dothue, 200, 255);
+      dothue += 32;
+    }
+  }
+}
+
 void loop() {
   //viz_pride();
+  //viz_pacifica();
 
-  if (stripIndex < NUM_STRIPS) {
-    set_strip(stripIndex, CRGB::White);
-    stripIndex += 1;
+  EVERY_N_SECONDS( SECONDS_PER_PALETTE ) {
+    chooseNextColorPalette( gTargetPalette );
   }
+  EVERY_N_MILLISECONDS( 10 ) {
+    nblendPaletteTowardPalette( gCurrentPalette, gTargetPalette, 12);
+  }
+  viz_twinkle();
 
-  viz_ripple();
+  //EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rainbow
+  //bpm();
+
+  //if (stripIndex < NUM_STRIPS) {
+  //  set_strip(stripIndex, CRGB::White);
+  //  stripIndex += 1;
+  //}
+
+  //viz_ripple();
 
   FastLED.show();
 }

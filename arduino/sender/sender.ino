@@ -56,7 +56,7 @@ void loop() {
       buttonDown = true;
 
       test.viz = VIZ_RIPPLE;
-      test.i = random(1, STRIPS_PER_SAIL - 1);
+      test.i = random(1, NUM_STRIPS - 1);
       test.j = random(1, NUM_LEDS - 1);
 
       esp_now_send(0, (uint8_t *) &test, sizeof(test));
