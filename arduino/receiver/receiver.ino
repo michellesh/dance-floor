@@ -24,10 +24,10 @@
 #define STRIP_START  0.3
 #define WIDTH        1100
 
-#define VIZ_DEFAULT     0
 #define VIZ_PRIDE       1
 #define VIZ_WINDSHIELD  2
 #define VIZ_RIPPLE      3
+#define SET_BRIGHTNESS  4
 
 #define SECONDS_PER_PALETTE  30
 
@@ -45,18 +45,19 @@ struct Sail {
 // Structure example to receive data
 // Must match the sender structure
 typedef struct msg {
-  uint8_t viz;
-  int i;
-  int j;
+  uint8_t action;
+  int value1;
+  int value2;
 } msg;
 
 CRGB leds[NUM_STRIPS][NUM_LEDS];
-msg myData;
+msg data;
 
 uint8_t boardNumber;
 uint8_t offset;
 uint8_t stripIndex = NUM_STRIPS;
-uint8_t viz = VIZ_DEFAULT;
+uint8_t action;
+uint8_t setBrightness = BRIGHTNESS;
 
 int16_t current[NUM_STRIPS][NUM_LEDS];
 int16_t previous[NUM_STRIPS][NUM_LEDS];
@@ -129,20 +130,24 @@ void set_all(CRGB color) {
 
 // Callback function that will be executed when data is received
 void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
-  memcpy(&myData, incomingData, sizeof(myData));
+  memcpy(&data, incomingData, sizeof(data));
   Serial.print("Bytes received: ");
   Serial.println(len);
 
-  viz = myData.viz;
-  if (viz == VIZ_WINDSHIELD) {
+  action = data.action;
+  if (action == VIZ_WINDSHIELD) {
     stripIndex = 0;
-  } else if (viz == VIZ_RIPPLE) {
+  } else if (action == VIZ_RIPPLE) {
     set_all(CRGB(0, 0, 0));
-    Serial.print("i: ");
-    Serial.println(myData.i);
-    Serial.print("j: ");
-    Serial.println(myData.j);
-    current[(int)myData.i][(int)myData.j] = 500;
+    Serial.print("RIPPLE: ");
+    Serial.print(data.value1);
+    Serial.print(" ");
+    Serial.println(data.value2);
+    current[(int)data.value1][(int)data.value2] = 500;
+  } else if (action == SET_BRIGHTNESS) {
+    Serial.print("SET_BRIGHTNESS: ");
+    Serial.println(data.value1);
+    setBrightness = (uint8_t)data.value1;
   }
 }
 
@@ -197,16 +202,16 @@ void juggle() {
 }
 
 void loop() {
-  //viz_pride();
+  viz_pride();
   //viz_pacifica();
 
-  EVERY_N_SECONDS( SECONDS_PER_PALETTE ) {
-    chooseNextColorPalette( gTargetPalette );
-  }
-  EVERY_N_MILLISECONDS( 10 ) {
-    nblendPaletteTowardPalette( gCurrentPalette, gTargetPalette, 12);
-  }
-  viz_twinkle();
+  //EVERY_N_SECONDS( SECONDS_PER_PALETTE ) {
+  //  chooseNextColorPalette( gTargetPalette );
+  //}
+  //EVERY_N_MILLISECONDS( 10 ) {
+  //  nblendPaletteTowardPalette( gCurrentPalette, gTargetPalette, 12);
+  //}
+  //viz_twinkle();
 
   //EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rainbow
   //bpm();
@@ -217,6 +222,12 @@ void loop() {
   //}
 
   //viz_ripple();
+
+  for (int i = 0; i < NUM_STRIPS; i++) {
+    for (int j = 0; j < NUM_LEDS; j++) {
+      leds[i][j].nscale8(setBrightness);
+    }
+  }
 
   FastLED.show();
 }
