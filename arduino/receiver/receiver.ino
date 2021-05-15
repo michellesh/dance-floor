@@ -33,9 +33,6 @@
 #define VIZ_TWINKLE   2
 #define VIZ_PACIFICA  3
 
-int backgrounds[] = {VIZ_PRIDE, VIZ_TWINKLE, VIZ_PACIFICA};
-int activeVizIndex = 0;
-
 typedef struct XY {
   float x;
   float y;
@@ -58,11 +55,9 @@ typedef struct msg {
 CRGB leds[NUM_STRIPS][NUM_LEDS];
 msg data;
 
-uint8_t boardNumber;
-uint8_t offset;
 uint8_t stripIndex = NUM_STRIPS;
-uint8_t action;
 uint8_t setBrightness = BRIGHTNESS;
+uint8_t activeViz = 0;
 
 int16_t current[NUM_STRIPS][NUM_LEDS];
 int16_t previous[NUM_STRIPS][NUM_LEDS];
@@ -85,11 +80,11 @@ void setup() {
   esp_now_set_self_role(ESP_NOW_ROLE_SLAVE);
   esp_now_register_recv_cb(OnDataRecv);
 
-  boardNumber = WiFi.macAddress() == macAddress1   ? 1
-                : WiFi.macAddress() == macAddress2 ? 2
-                : WiFi.macAddress() == macAddress3 ? 3
-                                                   : 4;
-  offset = (boardNumber - 1) * STRIPS_PER_SAIL;
+  uint8_t boardNumber = WiFi.macAddress() == macAddress1   ? 1
+                        : WiFi.macAddress() == macAddress2 ? 2
+                        : WiFi.macAddress() == macAddress3 ? 3
+                                                           : 4;
+  uint8_t offset = (boardNumber - 1) * STRIPS_PER_SAIL;
 
   FastLED.addLeds<LED_TYPE, DATA_PIN_2, COLOR_ORDER>(leds[offset], NUM_LEDS)
     .setCorrection(TypicalLEDStrip)
@@ -139,21 +134,20 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
   Serial.print("Bytes received: ");
   Serial.println(len);
 
-  action = data.action;
-  if (action == ACTION_WINDSHIELD) {
+  if (data.action == ACTION_WINDSHIELD) {
     stripIndex = 0;
-  } else if (action == ACTION_RIPPLE) {
+  } else if (data.action == ACTION_RIPPLE) {
     Serial.print("RIPPLE: ");
     Serial.print(data.value1);
     Serial.print(" ");
     Serial.println(data.value2);
     current[(int)data.value1][(int)data.value2] = 500;
-  } else if (action == ACTION_SET_BRIGHTNESS) {
+  } else if (data.action == ACTION_SET_BRIGHTNESS) {
     Serial.print("ACTION_SET_BRIGHTNESS: ");
     Serial.println(data.value1);
     setBrightness = (uint8_t)data.value1;
-  } else if (action == ACTION_CYCLE_BACKGROUND) {
-    cycleBackgroundViz();
+  } else if (data.action == ACTION_CYCLE_BACKGROUND) {
+    activeViz = data.value1;
     Serial.print("ACTION_CYCLE_BACKGROUND");
   }
 }
@@ -208,24 +202,10 @@ void juggle() {
   }
 }
 
-void cycleBackgroundViz() {
-  int len = sizeof(backgrounds) / sizeof(backgrounds[0]);
-  activeVizIndex = activeVizIndex < len - 1 ? activeVizIndex + 1 : 0;
-  Serial.print("New background: ");
-  Serial.print(backgrounds[activeVizIndex]);
-  Serial.print(" index ");
-  Serial.println(activeVizIndex);
-}
-
 void loop() {
-  // Every N seconds, cycle through the active background viz
-  EVERY_N_SECONDS(30) {
-    cycleBackgroundViz();
-  }
-
-  if (backgrounds[activeVizIndex] == VIZ_PRIDE) {
+  if (activeViz == VIZ_PRIDE) {
     viz_pride();
-  } else if (backgrounds[activeVizIndex] == VIZ_TWINKLE) {
+  } else if (activeViz == VIZ_TWINKLE) {
     EVERY_N_SECONDS(30) {
       chooseNextColorPalette(gTargetPalette);
     }
@@ -233,7 +213,7 @@ void loop() {
       nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, 12);
     }
     viz_twinkle();
-  } else if (backgrounds[activeVizIndex] == VIZ_PACIFICA) {
+  } else if (activeViz == VIZ_PACIFICA) {
     viz_pacifica();
   }
 

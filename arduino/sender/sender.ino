@@ -1,5 +1,6 @@
 #include "secrets.h"
 #include <ESP8266WiFi.h>
+#include <FastLED.h>
 #include <espnow.h>
 
 #define SLIDER_1     16 // D0
@@ -21,6 +22,13 @@
 #define ACTION_SET_BRIGHTNESS    3
 #define ACTION_WINDSHIELD        4
 
+#define VIZ_PRIDE     1
+#define VIZ_TWINKLE   2
+#define VIZ_PACIFICA  3
+
+int backgrounds[] = {VIZ_PRIDE, VIZ_TWINKLE, VIZ_PACIFICA};
+int activeVizIndex = 0;
+
 typedef struct msg {
   uint8_t action;
   int value1;
@@ -40,7 +48,7 @@ struct Slider {
 
 msg ripple = {ACTION_RIPPLE};
 msg brightness = {ACTION_SET_BRIGHTNESS};
-msg background = {ACTION_CYCLE_BACKGROUND};
+msg background = {ACTION_CYCLE_BACKGROUND, VIZ_PRIDE};
 
 Button redButton = {RED_BUTTON, false};
 Button blueButton = {BLUE_BUTTON, false};
@@ -51,6 +59,10 @@ Slider slider1 = {SLIDER_1};
 Slider slider2 = {SLIDER_2};
 Slider slider3 = {SLIDER_3};
 Slider slider4 = {SLIDER_4};
+
+void send(msg m) {
+  esp_now_send(0, (uint8_t *) &m, sizeof(m));
+}
 
 void setup() {
   Serial.begin(115200);
@@ -93,6 +105,16 @@ auto scale(float domainStart, float domainEnd, float rangeStart, float rangeEnd,
 
 auto sliderToBrightness = scale(1024, 3, 0, 255, true);
 
+void cycleBackgroundViz() {
+  int len = sizeof(backgrounds) / sizeof(backgrounds[0]);
+  activeVizIndex = activeVizIndex < len - 1 ? activeVizIndex + 1 : 0;
+  background.value1 = backgrounds[activeVizIndex];
+  Serial.print("New background: ");
+  Serial.print(background.value1);
+  Serial.print(" index ");
+  Serial.println(activeVizIndex);
+}
+
 bool isButtonPressed(Button button) {
   return digitalRead(button.pin) == 0;
 }
@@ -110,11 +132,13 @@ bool sliderValueChanged(Slider slider) {
   return slider.value < (slider.prev - BUFFER) || slider.value > (slider.prev + BUFFER);
 }
 
-void send(msg m) {
-  esp_now_send(0, (uint8_t *) &m, sizeof(m));
-}
-
 void loop() {
+  // Every N seconds, cycle through the active background viz
+  EVERY_N_SECONDS(30) {
+    cycleBackgroundViz();
+    send(background);
+  }
+
   slider1.value = getSliderValue(slider1);
   if (sliderValueChanged(slider1)) {
     Serial.print("Slider 1 changed ");
@@ -130,6 +154,8 @@ void loop() {
     if (!yellowButton.pressed) {
       Serial.println("Yellow button pressed");
       yellowButton.pressed = true;
+
+      cycleBackgroundViz();
       send(background);
     }
   } else {
