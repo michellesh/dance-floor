@@ -24,12 +24,17 @@
 #define STRIP_START  0.3
 #define WIDTH        1100
 
-#define VIZ_PRIDE       1
-#define VIZ_WINDSHIELD  2
-#define VIZ_RIPPLE      3
-#define SET_BRIGHTNESS  4
+#define ACTION_CYCLE_BACKGROUND  1
+#define ACTION_RIPPLE            2
+#define ACTION_SET_BRIGHTNESS    3
+#define ACTION_WINDSHIELD        4
 
-#define SECONDS_PER_PALETTE  30
+#define VIZ_PRIDE     1
+#define VIZ_TWINKLE   2
+#define VIZ_PACIFICA  3
+
+int backgrounds[] = {VIZ_PRIDE, VIZ_TWINKLE, VIZ_PACIFICA};
+int activeVizIndex = 0;
 
 typedef struct XY {
   float x;
@@ -135,19 +140,22 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
   Serial.println(len);
 
   action = data.action;
-  if (action == VIZ_WINDSHIELD) {
+  if (action == ACTION_WINDSHIELD) {
     stripIndex = 0;
-  } else if (action == VIZ_RIPPLE) {
+  } else if (action == ACTION_RIPPLE) {
     set_all(CRGB(0, 0, 0));
     Serial.print("RIPPLE: ");
     Serial.print(data.value1);
     Serial.print(" ");
     Serial.println(data.value2);
     current[(int)data.value1][(int)data.value2] = 500;
-  } else if (action == SET_BRIGHTNESS) {
-    Serial.print("SET_BRIGHTNESS: ");
+  } else if (action == ACTION_SET_BRIGHTNESS) {
+    Serial.print("ACTION_SET_BRIGHTNESS: ");
     Serial.println(data.value1);
     setBrightness = (uint8_t)data.value1;
+  } else if (action == ACTION_CYCLE_BACKGROUND) {
+    cycleBackgroundViz();
+    Serial.print("ACTION_CYCLE_BACKGROUND");
   }
 }
 
@@ -201,17 +209,34 @@ void juggle() {
   }
 }
 
-void loop() {
-  viz_pride();
-  //viz_pacifica();
+void cycleBackgroundViz() {
+  int len = sizeof(backgrounds) / sizeof(backgrounds[0]);
+  activeVizIndex = activeVizIndex < len - 1 ? activeVizIndex + 1 : 0;
+  Serial.print("New background: ");
+  Serial.print(backgrounds[activeVizIndex]);
+  Serial.print(" index ");
+  Serial.println(activeVizIndex);
+}
 
-  //EVERY_N_SECONDS( SECONDS_PER_PALETTE ) {
-  //  chooseNextColorPalette( gTargetPalette );
-  //}
-  //EVERY_N_MILLISECONDS( 10 ) {
-  //  nblendPaletteTowardPalette( gCurrentPalette, gTargetPalette, 12);
-  //}
-  //viz_twinkle();
+void loop() {
+  // Every N seconds, cycle through the active background viz
+  EVERY_N_SECONDS(10) {
+    cycleBackgroundViz();
+  }
+
+  if (backgrounds[activeVizIndex] == VIZ_PRIDE) {
+    viz_pride();
+  } else if (backgrounds[activeVizIndex] == VIZ_TWINKLE) {
+    EVERY_N_SECONDS(30) {
+      chooseNextColorPalette(gTargetPalette);
+    }
+    EVERY_N_MILLISECONDS(10) {
+      nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, 12);
+    }
+    viz_twinkle();
+  } else if (backgrounds[activeVizIndex] == VIZ_PACIFICA) {
+    viz_pacifica();
+  }
 
   //EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rainbow
   //bpm();
