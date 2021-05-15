@@ -23,7 +23,9 @@ void viz_ripple() {
         current[i][j];
       current[i][j] = current[i][j] * DAMPENING;
       int16_t value = convert(current[i][j]);
-      leds[i][j] = CRGB(value, value, value);
+      if (value > 0) {
+        leds[i][j] = CRGB(value, value, value);
+      }
     }
   }
 

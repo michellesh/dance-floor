@@ -143,7 +143,6 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
   if (action == ACTION_WINDSHIELD) {
     stripIndex = 0;
   } else if (action == ACTION_RIPPLE) {
-    set_all(CRGB(0, 0, 0));
     Serial.print("RIPPLE: ");
     Serial.print(data.value1);
     Serial.print(" ");
@@ -220,7 +219,7 @@ void cycleBackgroundViz() {
 
 void loop() {
   // Every N seconds, cycle through the active background viz
-  EVERY_N_SECONDS(10) {
+  EVERY_N_SECONDS(30) {
     cycleBackgroundViz();
   }
 
@@ -246,7 +245,7 @@ void loop() {
   //  stripIndex += 1;
   //}
 
-  //viz_ripple();
+  viz_ripple();
 
   for (int i = 0; i < NUM_STRIPS; i++) {
     for (int j = 0; j < NUM_LEDS; j++) {

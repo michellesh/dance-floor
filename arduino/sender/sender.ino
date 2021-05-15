@@ -21,11 +21,6 @@
 #define ACTION_SET_BRIGHTNESS    3
 #define ACTION_WINDSHIELD        4
 
-int slider1;
-int slider2;
-int slider3;
-int slider4;
-
 typedef struct msg {
   uint8_t action;
   int value1;
@@ -37,23 +32,25 @@ struct Button {
   bool pressed;
 };
 
-Button redButton = {RED_BUTTON, false};
-Button blueButton = {BLUE_BUTTON, false};
-Button yellowButton = {YELLOW_BUTTON, false};
-Button greenButton = {GREEN_BUTTON, false};
+struct Slider {
+  int pin;
+  int value;
+  int prev;
+};
 
 msg ripple = {ACTION_RIPPLE};
 msg brightness = {ACTION_SET_BRIGHTNESS};
 msg background = {ACTION_CYCLE_BACKGROUND};
 
-byte buttonPin = 0;
-bool buttonDown = false;
+Button redButton = {RED_BUTTON, false};
+Button blueButton = {BLUE_BUTTON, false};
+Button yellowButton = {YELLOW_BUTTON, false};
+Button greenButton = {GREEN_BUTTON, false};
 
-unsigned long lastTime = 0;
-unsigned long timerDelay = 5000;
-
-int sliderValue1, prevSlider1;
-int sliderValue2, prevSlider2;
+Slider slider1 = {SLIDER_1};
+Slider slider2 = {SLIDER_2};
+Slider slider3 = {SLIDER_3};
+Slider slider4 = {SLIDER_4};
 
 void setup() {
   Serial.begin(115200);
@@ -82,8 +79,6 @@ void setup() {
   pinMode(SLIDER_3, OUTPUT);
   pinMode(SLIDER_4, OUTPUT);
   pinMode(A0, INPUT);
-
-  pinMode(buttonPin, INPUT_PULLUP); // TODO remove
 }
 
 auto scale(float domainStart, float domainEnd, float rangeStart, float rangeEnd, bool clamp = false) {
@@ -102,17 +97,17 @@ bool isButtonPressed(Button button) {
   return digitalRead(button.pin) == 0;
 }
 
-int getSliderValue(int sliderPin) {
-  digitalWrite(sliderPin, HIGH);
+int getSliderValue(Slider slider) {
+  digitalWrite(slider.pin, HIGH);
   delay(100);
   int sliderValue = analogRead(0);
-  digitalWrite(sliderPin, LOW);
+  digitalWrite(slider.pin, LOW);
   return sliderValue;
 }
 
-bool sliderValueChanged(int value, int prev) {
+bool sliderValueChanged(Slider slider) {
   int BUFFER = 20;
-  return value < (prev - BUFFER) || value > (prev + BUFFER);
+  return slider.value < (slider.prev - BUFFER) || slider.value > (slider.prev + BUFFER);
 }
 
 void send(msg m) {
@@ -120,12 +115,15 @@ void send(msg m) {
 }
 
 void loop() {
-  sliderValue1 = getSliderValue(SLIDER_1);
-  if (sliderValueChanged(sliderValue1, prevSlider1)) {
-    Serial.println("Slider 1 changed");
-    brightness.value1 = sliderToBrightness(sliderValue1);
+  slider1.value = getSliderValue(slider1);
+  if (sliderValueChanged(slider1)) {
+    Serial.print("Slider 1 changed ");
+    Serial.println(slider1.value);
+    brightness.value1 = sliderToBrightness(slider1.value);
+    Serial.print("Brightness ");
+    Serial.println(brightness.value1);
     send(brightness);
-    prevSlider1 = sliderValue1;
+    slider1.prev = slider1.value;
   }
 
   if (isButtonPressed(yellowButton)) {
