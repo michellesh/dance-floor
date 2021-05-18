@@ -1,4 +1,5 @@
 #define FASTLED_ESP8266_NODEMCU_PIN_ORDER
+#include "colors.h"
 #include "secrets.h"
 #include <ESP8266WiFi.h>
 #include <FastLED.h>
@@ -28,6 +29,8 @@
 #define ACTION_RIPPLE            2
 #define ACTION_SET_BRIGHTNESS    3
 #define ACTION_WINDSHIELD        4
+#define ACTION_SET_PALETTE       5
+#define ACTION_CYCLE_PALETTE     6
 
 #define VIZ_PRIDE     1
 #define VIZ_TWINKLE   2
@@ -149,6 +152,14 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
   } else if (data.action == ACTION_CYCLE_BACKGROUND) {
     activeViz = data.value1;
     Serial.print("ACTION_CYCLE_BACKGROUND");
+  } else if (data.action == ACTION_SET_PALETTE) {
+    Serial.print("ACTION_SET_PALETTE ");
+    Serial.print(data.value1);
+    gCurrentPalette = *(ActivePaletteList[data.value1]);
+  } else if (data.action == ACTION_CYCLE_PALETTE) {
+    Serial.print("ACTION_CYCLE_PALETTE ");
+    Serial.print(data.value1);
+    gTargetPalette = *(ActivePaletteList[data.value1]);
   }
 }
 
@@ -206,9 +217,6 @@ void loop() {
   if (activeViz == VIZ_PRIDE) {
     viz_pride();
   } else if (activeViz == VIZ_TWINKLE) {
-    EVERY_N_SECONDS(30) {
-      chooseNextColorPalette(gTargetPalette);
-    }
     EVERY_N_MILLISECONDS(10) {
       nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, 12);
     }
@@ -220,10 +228,10 @@ void loop() {
   //EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rainbow
   //bpm();
 
-  //if (stripIndex < NUM_STRIPS) {
-  //  set_strip(stripIndex, CRGB::White);
-  //  stripIndex += 1;
-  //}
+  if (stripIndex < NUM_STRIPS) {
+    set_strip(stripIndex, CRGB::White);
+    stripIndex += 1;
+  }
 
   viz_ripple();
 

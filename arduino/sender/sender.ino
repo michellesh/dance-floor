@@ -21,6 +21,8 @@
 #define ACTION_RIPPLE            2
 #define ACTION_SET_BRIGHTNESS    3
 #define ACTION_WINDSHIELD        4
+#define ACTION_SET_PALETTE       5
+#define ACTION_CYCLE_PALETTE     6
 
 #define VIZ_PRIDE     1
 #define VIZ_TWINKLE   2
@@ -28,6 +30,8 @@
 
 int backgrounds[] = {VIZ_PRIDE, VIZ_TWINKLE, VIZ_PACIFICA};
 int activeVizIndex = 0;
+int activePalette = 0;
+int numberOfPalettes = 9;
 
 typedef struct msg {
   uint8_t action;
@@ -49,6 +53,9 @@ struct Slider {
 msg ripple = {ACTION_RIPPLE};
 msg brightness = {ACTION_SET_BRIGHTNESS};
 msg background = {ACTION_CYCLE_BACKGROUND, VIZ_PRIDE};
+msg blendPalette = {ACTION_CYCLE_PALETTE};
+msg palette = {ACTION_SET_PALETTE};
+msg windshield = {ACTION_WINDSHIELD};
 
 Button redButton = {RED_BUTTON, false};
 Button blueButton = {BLUE_BUTTON, false};
@@ -104,6 +111,7 @@ auto scale(float domainStart, float domainEnd, float rangeStart, float rangeEnd,
 }
 
 auto sliderToBrightness = scale(1024, 3, 0, 255, true);
+auto sliderToColorPalette = scale(972, 5, 8, 0, true);
 
 void cycleBackgroundViz() {
   int len = sizeof(backgrounds) / sizeof(backgrounds[0]);
@@ -134,9 +142,17 @@ bool sliderValueChanged(Slider slider) {
 
 void loop() {
   // Every N seconds, cycle through the active background viz
+  // TODO change these to real values after done testing
   EVERY_N_SECONDS(30) {
     cycleBackgroundViz();
     send(background);
+  }
+
+  EVERY_N_SECONDS(10) {
+    activePalette = activePalette == numberOfPalettes - 1 ? 0
+                    : activePalette + 1;
+    blendPalette.value1 = activePalette;
+    send(blendPalette);
   }
 
   slider1.value = getSliderValue(slider1);
@@ -148,6 +164,18 @@ void loop() {
     Serial.println(brightness.value1);
     send(brightness);
     slider1.prev = slider1.value;
+  }
+
+  slider2.value = getSliderValue(slider2);
+  if (sliderValueChanged(slider2)) {
+    Serial.print("Slider 2 changed ");
+    Serial.println(slider2.value);
+    activePalette = sliderToColorPalette(slider2.value);
+    palette.value1 = activePalette;
+    Serial.print("Palette ");
+    Serial.println(palette.value1);
+    send(palette);
+    slider2.prev = slider2.value;
   }
 
   if (isButtonPressed(yellowButton)) {
@@ -174,5 +202,15 @@ void loop() {
     }
   } else {
     blueButton.pressed = false;
+  }
+
+  if (isButtonPressed(greenButton)) {
+    if (!greenButton.pressed) {
+      Serial.println("Green button pressed");
+      greenButton.pressed = true;
+      send(windshield);
+    }
+  } else {
+    greenButton.pressed = false;
   }
 }
