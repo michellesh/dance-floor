@@ -121,6 +121,7 @@ void setup() {
   }
 
   chooseNextColorPalette(gTargetPalette);
+  init_starfield();
 }
 
 void set_all(CRGB color) {
@@ -181,11 +182,19 @@ float distance(XY p1, XY p2) {
   return sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
 }
 
-auto scale(float domainStart, float domainEnd, float rangeStart, float rangeEnd) {
+auto scale(float domainStart, float domainEnd, float rangeStart, float rangeEnd, bool clamp = false) {
   return [=](float value) {
     float percentage = (value - domainStart) / (domainEnd - domainStart);
-    return rangeStart + (rangeEnd - rangeStart) * percentage;
+    float newValue = rangeStart + (rangeEnd - rangeStart) * percentage;
+    return clamp && newValue < min(rangeStart, rangeEnd)   ? min(rangeStart, rangeEnd)
+           : clamp && newValue > max(rangeStart, rangeEnd) ? max(rangeStart, rangeEnd)
+                                                           : newValue;
   };
+}
+
+float mapf(float value, float inMin, float inMax, float outMin, float outMax) {
+  float percentage = (value - inMin) / (inMax - inMin);
+  return outMin + (outMax - outMin) * percentage;
 }
 
 uint8_t gHue = 0;
@@ -214,32 +223,34 @@ void juggle() {
 }
 
 void loop() {
-  if (activeViz == VIZ_PRIDE) {
-    viz_pride();
-  } else if (activeViz == VIZ_TWINKLE) {
-    EVERY_N_MILLISECONDS(10) {
-      nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, 12);
-    }
-    viz_twinkle();
-  } else if (activeViz == VIZ_PACIFICA) {
-    viz_pacifica();
-  }
+  viz_starfield(1);
+
+  //if (activeViz == VIZ_PRIDE) {
+  //  viz_pride();
+  //} else if (activeViz == VIZ_TWINKLE) {
+  //  EVERY_N_MILLISECONDS(10) {
+  //    nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, 12);
+  //  }
+  //  viz_twinkle();
+  //} else if (activeViz == VIZ_PACIFICA) {
+  //  viz_pacifica();
+  //}
 
   //EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rainbow
   //bpm();
 
-  if (stripIndex < NUM_STRIPS) {
-    set_strip(stripIndex, CRGB::White);
-    stripIndex += 1;
-  }
+  //if (stripIndex < NUM_STRIPS) {
+  //  set_strip(stripIndex, CRGB::White);
+  //  stripIndex += 1;
+  //}
 
-  viz_ripple();
+  //viz_ripple();
 
-  for (int i = 0; i < NUM_STRIPS; i++) {
-    for (int j = 0; j < NUM_LEDS; j++) {
-      leds[i][j].nscale8(setBrightness);
-    }
-  }
+  //for (int i = 0; i < NUM_STRIPS; i++) {
+  //  for (int j = 0; j < NUM_LEDS; j++) {
+  //    leds[i][j].nscale8(setBrightness);
+  //  }
+  //}
 
   FastLED.show();
 }
