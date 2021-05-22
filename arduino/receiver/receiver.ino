@@ -35,6 +35,9 @@
 #define VIZ_PRIDE     1
 #define VIZ_TWINKLE   2
 #define VIZ_PACIFICA  3
+#define VIZ_STARFIELD 4
+#define VIZ_BPM       5
+#define VIZ_JUGGLE    6
 
 typedef struct XY {
   float x;
@@ -223,34 +226,36 @@ void juggle() {
 }
 
 void loop() {
-  viz_starfield(1);
+  if (activeViz == VIZ_PRIDE) {
+    viz_pride();
+  } else if (activeViz == VIZ_TWINKLE) {
+    EVERY_N_MILLISECONDS(10) {
+      nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, 12);
+    }
+    viz_twinkle();
+  } else if (activeViz == VIZ_PACIFICA) {
+    viz_pacifica();
+  } else if (activeViz == VIZ_STARFIELD) {
+    viz_starfield(1);
+  } else if (activeViz == VIZ_BPM) {
+    EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rainbow
+    bpm();
+  } else if (activeViz == VIZ_JUGGLE) {
+    juggle();
+  }
 
-  //if (activeViz == VIZ_PRIDE) {
-  //  viz_pride();
-  //} else if (activeViz == VIZ_TWINKLE) {
-  //  EVERY_N_MILLISECONDS(10) {
-  //    nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, 12);
-  //  }
-  //  viz_twinkle();
-  //} else if (activeViz == VIZ_PACIFICA) {
-  //  viz_pacifica();
-  //}
+  if (stripIndex < NUM_STRIPS) {
+    set_strip(stripIndex, CRGB::White);
+    stripIndex += 1;
+  }
 
-  //EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rainbow
-  //bpm();
+  viz_ripple();
 
-  //if (stripIndex < NUM_STRIPS) {
-  //  set_strip(stripIndex, CRGB::White);
-  //  stripIndex += 1;
-  //}
-
-  //viz_ripple();
-
-  //for (int i = 0; i < NUM_STRIPS; i++) {
-  //  for (int j = 0; j < NUM_LEDS; j++) {
-  //    leds[i][j].nscale8(setBrightness);
-  //  }
-  //}
+  for (int i = 0; i < NUM_STRIPS; i++) {
+    for (int j = 0; j < NUM_LEDS; j++) {
+      leds[i][j].nscale8(setBrightness);
+    }
+  }
 
   FastLED.show();
 }

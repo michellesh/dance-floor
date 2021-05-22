@@ -27,8 +27,11 @@
 #define VIZ_PRIDE     1
 #define VIZ_TWINKLE   2
 #define VIZ_PACIFICA  3
+#define VIZ_STARFIELD 4
+#define VIZ_BPM       5
+#define VIZ_JUGGLE    6
 
-int backgrounds[] = {VIZ_PRIDE, VIZ_TWINKLE, VIZ_PACIFICA};
+int backgrounds[] = {VIZ_PRIDE, VIZ_TWINKLE, VIZ_PACIFICA, VIZ_STARFIELD, VIZ_BPM, VIZ_JUGGLE};
 int activeVizIndex = 0;
 int activePalette = 0;
 int numberOfPalettes = 9;
@@ -143,7 +146,7 @@ bool sliderValueChanged(Slider slider) {
 void loop() {
   // Every N seconds, cycle through the active background viz
   // TODO change these to real values after done testing
-  EVERY_N_SECONDS(30) {
+  EVERY_N_SECONDS(120) {
     cycleBackgroundViz();
     send(background);
   }
