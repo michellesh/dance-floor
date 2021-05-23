@@ -30,6 +30,7 @@
 #define VIZ_STARFIELD 4
 #define VIZ_BPM       5
 #define VIZ_JUGGLE    6
+#define ACTION_SPEED  7
 
 int backgrounds[] = {VIZ_PRIDE, VIZ_TWINKLE, VIZ_PACIFICA, VIZ_STARFIELD, VIZ_BPM, VIZ_JUGGLE};
 int activeVizIndex = 0;
@@ -59,6 +60,7 @@ msg background = {ACTION_CYCLE_BACKGROUND, VIZ_PRIDE};
 msg blendPalette = {ACTION_CYCLE_PALETTE};
 msg palette = {ACTION_SET_PALETTE};
 msg windshield = {ACTION_WINDSHIELD};
+msg speed = {ACTION_SPEED};
 
 Button redButton = {RED_BUTTON, false};
 Button blueButton = {BLUE_BUTTON, false};
@@ -115,6 +117,7 @@ auto scale(float domainStart, float domainEnd, float rangeStart, float rangeEnd,
 
 auto sliderToBrightness = scale(1024, 3, 0, 255, true);
 auto sliderToColorPalette = scale(972, 5, 8, 0, true);
+auto sliderToSpeed = scale(1000, 0, 1, 10, true);
 
 void cycleBackgroundViz() {
   int len = sizeof(backgrounds) / sizeof(backgrounds[0]);
@@ -179,6 +182,17 @@ void loop() {
     Serial.println(palette.value1);
     send(palette);
     slider2.prev = slider2.value;
+  }
+
+  slider3.value = getSliderValue(slider3);
+  if (sliderValueChanged(slider3)) {
+    Serial.print("Slider 3 changed ");
+    Serial.println(slider3.value);
+    speed.value1 = sliderToSpeed(slider3.value);
+    Serial.print("Speed ");
+    Serial.println(speed.value1);
+    send(speed);
+    slider3.prev = slider3.value;
   }
 
   if (isButtonPressed(yellowButton)) {

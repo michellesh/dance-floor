@@ -3,7 +3,6 @@
 #define MIN_SPEED  0.01
 #define MAX_SPEED  5
 
-uint8_t speed = 1;
 uint8_t maxDepth = 255;
 typedef struct Star {
   uint8_t strand;
@@ -22,7 +21,7 @@ void init_starfield() {
   }
 }
 
-void viz_starfield(int speed) {
+void viz_starfield(float speed) {
   FastLED.clear();
   for (int x = 0; x < NUM_STARS; x++) {
     stars[x].currentY += speed * mapf(stars[x].currentY, stars[x].startY, stars[x].endY, MIN_SPEED, MAX_SPEED);

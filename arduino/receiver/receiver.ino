@@ -38,6 +38,7 @@
 #define VIZ_STARFIELD 4
 #define VIZ_BPM       5
 #define VIZ_JUGGLE    6
+#define ACTION_SPEED  7
 
 typedef struct XY {
   float x;
@@ -64,6 +65,7 @@ msg data;
 uint8_t stripIndex = NUM_STRIPS;
 uint8_t setBrightness = BRIGHTNESS;
 uint8_t activeViz = 0;
+uint8_t speed = 1;
 
 int16_t current[NUM_STRIPS][NUM_LEDS];
 int16_t previous[NUM_STRIPS][NUM_LEDS];
@@ -154,16 +156,21 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
     Serial.println(data.value1);
     setBrightness = (uint8_t)data.value1;
   } else if (data.action == ACTION_CYCLE_BACKGROUND) {
-    activeViz = data.value1;
     Serial.print("ACTION_CYCLE_BACKGROUND");
+    Serial.println(data.value1);
+    activeViz = data.value1;
   } else if (data.action == ACTION_SET_PALETTE) {
     Serial.print("ACTION_SET_PALETTE ");
-    Serial.print(data.value1);
+    Serial.println(data.value1);
     gCurrentPalette = *(ActivePaletteList[data.value1]);
   } else if (data.action == ACTION_CYCLE_PALETTE) {
     Serial.print("ACTION_CYCLE_PALETTE ");
-    Serial.print(data.value1);
+    Serial.println(data.value1);
     gTargetPalette = *(ActivePaletteList[data.value1]);
+  } else if (data.action == ACTION_SPEED) {
+    Serial.print("ACTION_SPEED ");
+    Serial.println(data.value1);
+    speed = data.value1;
   }
 }
 
@@ -232,11 +239,11 @@ void loop() {
     EVERY_N_MILLISECONDS(10) {
       nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, 12);
     }
-    viz_twinkle();
+    viz_twinkle(mapf(speed, 1, 10, 4, 9));
   } else if (activeViz == VIZ_PACIFICA) {
     viz_pacifica();
   } else if (activeViz == VIZ_STARFIELD) {
-    viz_starfield(1);
+    viz_starfield(mapf(speed, 1, 10, 0.5, 9));
   } else if (activeViz == VIZ_BPM) {
     EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rainbow
     bpm();

@@ -37,7 +37,7 @@ CRGB gBackgroundColor = CRGB::Black;
 //  "CalculateOneTwinkle" on each pixel.  It then displays
 //  either the twinkle color of the background color, 
 //  whichever is brighter.
-void viz_twinkle() {
+void viz_twinkle(uint8_t speed) {
   // "PRNG16" is the pseudorandom number generator
   // It MUST be reset to the same starting value each time
   // this function is called, so that the sequence of 'random'
@@ -83,7 +83,7 @@ void viz_twinkle() {
       // We now have the adjusted 'clock' for this pixel, now we call
       // the function that computes what color the pixel should be based
       // on the "brightness = f( time )" idea.
-      CRGB c = computeOneTwinkle( myclock30, myunique8);
+      CRGB c = computeOneTwinkle( myclock30, myunique8, speed);
 
       uint8_t cbright = c.getAverageLight();
       int16_t deltabright = cbright - backgroundBrightness;
@@ -117,9 +117,9 @@ void viz_twinkle() {
 //  of one cycle of the brightness wave function.
 //  The 'high digits' are also used to determine whether this pixel
 //  should light at all during this cycle, based on the TWINKLE_DENSITY.
-CRGB computeOneTwinkle( uint32_t ms, uint8_t salt)
+CRGB computeOneTwinkle( uint32_t ms, uint8_t salt, uint8_t speed)
 {
-  uint16_t ticks = ms >> (8-TWINKLE_SPEED);
+  uint16_t ticks = ms >> (8-speed);
   uint8_t fastcycle8 = ticks;
   uint16_t slowcycle16 = (ticks >> 8) + salt;
   slowcycle16 += sin8( slowcycle16);
