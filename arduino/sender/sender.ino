@@ -5,14 +5,14 @@
 
 #define SLIDER_1     15 // D8
 #define SLIDER_2     5  // D1
-#define SLIDER_3     4  // D2
+#define SLIDER_3     16 // D0
 #define SLIDER_4     0  // D3
 
 #define RED_BUTTON     2  // D4
 #define BLUE_BUTTON    14 // D5
 #define YELLOW_BUTTON  12 // D6
 #define GREEN_BUTTON   13 // D7
-#define WHITE_BUTTON   16 // D0
+#define WHITE_BUTTON   4  // D2
 
 #define NUM_LEDS        150     // TODO will depend on strand
 #define NUM_STRIPS      28
@@ -100,6 +100,7 @@ void setup() {
   pinMode(BLUE_BUTTON, INPUT_PULLUP);
   pinMode(YELLOW_BUTTON, INPUT_PULLUP);
   pinMode(GREEN_BUTTON, INPUT_PULLUP);
+  pinMode(WHITE_BUTTON, INPUT_PULLUP);
   pinMode(SLIDER_1, OUTPUT);
   pinMode(SLIDER_2, OUTPUT);
   pinMode(SLIDER_3, OUTPUT);
@@ -150,7 +151,6 @@ bool sliderValueChanged(Slider slider) {
 
 void loop() {
   // Every N seconds, cycle through the active background viz
-  // TODO change these to real values after done testing
   EVERY_N_SECONDS(120) {
     cycleBackgroundViz();
     send(background);
