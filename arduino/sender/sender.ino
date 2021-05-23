@@ -3,7 +3,7 @@
 #include <FastLED.h>
 #include <espnow.h>
 
-#define SLIDER_1     16 // D0
+#define SLIDER_1     15 // D8
 #define SLIDER_2     5  // D1
 #define SLIDER_3     4  // D2
 #define SLIDER_4     0  // D3
@@ -12,6 +12,7 @@
 #define BLUE_BUTTON    14 // D5
 #define YELLOW_BUTTON  12 // D6
 #define GREEN_BUTTON   13 // D7
+#define WHITE_BUTTON   16 // D0
 
 #define NUM_LEDS        150     // TODO will depend on strand
 #define NUM_STRIPS      28
@@ -66,6 +67,7 @@ Button redButton = {RED_BUTTON, false};
 Button blueButton = {BLUE_BUTTON, false};
 Button yellowButton = {YELLOW_BUTTON, false};
 Button greenButton = {GREEN_BUTTON, false};
+Button whiteButton = {WHITE_BUTTON, false};
 
 Slider slider1 = {SLIDER_1};
 Slider slider2 = {SLIDER_2};
@@ -195,6 +197,13 @@ void loop() {
     slider3.prev = slider3.value;
   }
 
+  slider4.value = getSliderValue(slider4);
+  if (sliderValueChanged(slider4)) {
+    Serial.print("Slider 4 changed ");
+    Serial.println(slider4.value);
+    slider4.prev = slider4.value;
+  }
+
   if (isButtonPressed(yellowButton)) {
     if (!yellowButton.pressed) {
       Serial.println("Yellow button pressed");
@@ -229,5 +238,23 @@ void loop() {
     }
   } else {
     greenButton.pressed = false;
+  }
+
+  if (isButtonPressed(redButton)) {
+    if (!redButton.pressed) {
+      Serial.println("Red button pressed");
+      redButton.pressed = true;
+    }
+  } else {
+    redButton.pressed = false;
+  }
+
+  if (isButtonPressed(whiteButton)) {
+    if (!whiteButton.pressed) {
+      Serial.println("White button pressed");
+      whiteButton.pressed = true;
+    }
+  } else {
+    whiteButton.pressed = false;
   }
 }
