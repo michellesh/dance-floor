@@ -38,17 +38,3 @@ void viz_ripple() {
     }
   }
 }
-
-/* A ripple viz based on the xy coordinate plane. Too slow currently
- */
-void viz_ripple_xy(float radius, XY center) {
-  float RIPPLE_WIDTH = 50;
-  for (int i = 0; i < NUM_STRIPS; i++) {
-    for (int j = 0; j < NUM_LEDS; j++) {
-      float d = distance(ledxy(i, j), center);
-      if (d < radius && d > radius - RIPPLE_WIDTH) {
-        leds[i][j] = CRGB::White;
-      }
-    }
-  }
-}

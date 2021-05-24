@@ -1,3 +1,4 @@
+#include "dance_floor_shared.h"
 #include "secrets.h"
 #include <ESP8266WiFi.h>
 #include <FastLED.h>
@@ -14,35 +15,10 @@
 #define GREEN_BUTTON   13 // D7
 #define WHITE_BUTTON   4  // D2
 
-#define NUM_LEDS        150     // TODO will depend on strand
-#define NUM_STRIPS      28
-#define STRIPS_PER_SAIL 7
-
-#define ACTION_CYCLE_BACKGROUND  1
-#define ACTION_RIPPLE            2
-#define ACTION_SET_BRIGHTNESS    3
-#define ACTION_WINDSHIELD        4
-#define ACTION_SET_PALETTE       5
-#define ACTION_CYCLE_PALETTE     6
-
-#define VIZ_PRIDE     1
-#define VIZ_TWINKLE   2
-#define VIZ_PACIFICA  3
-#define VIZ_STARFIELD 4
-#define VIZ_BPM       5
-#define VIZ_JUGGLE    6
-#define ACTION_SPEED  7
-
 int backgrounds[] = {VIZ_PRIDE, VIZ_TWINKLE, VIZ_PACIFICA, VIZ_STARFIELD, VIZ_BPM, VIZ_JUGGLE};
 int activeVizIndex = 0;
 int activePalette = 0;
 int numberOfPalettes = 9;
-
-typedef struct msg {
-  uint8_t action;
-  int value1;
-  int value2;
-} msg;
 
 struct Button {
   int pin;
@@ -73,6 +49,10 @@ Slider slider1 = {SLIDER_1};
 Slider slider2 = {SLIDER_2};
 Slider slider3 = {SLIDER_3};
 Slider slider4 = {SLIDER_4};
+
+auto sliderToBrightness = scale(1024, 3, 0, 255, true);
+auto sliderToColorPalette = scale(972, 5, 8, 0, true);
+auto sliderToSpeed = scale(1000, 0, 1, 10, true);
 
 void send(msg m) {
   esp_now_send(0, (uint8_t *) &m, sizeof(m));
@@ -107,20 +87,6 @@ void setup() {
   pinMode(SLIDER_4, OUTPUT);
   pinMode(A0, INPUT);
 }
-
-auto scale(float domainStart, float domainEnd, float rangeStart, float rangeEnd, bool clamp = false) {
-  return [=](float value) {
-    float percentage = (value - domainStart) / (domainEnd - domainStart);
-    float newValue = rangeStart + (rangeEnd - rangeStart) * percentage;
-    return clamp && newValue < min(rangeStart, rangeEnd)   ? min(rangeStart, rangeEnd)
-           : clamp && newValue > max(rangeStart, rangeEnd) ? max(rangeStart, rangeEnd)
-                                                           : newValue;
-  };
-}
-
-auto sliderToBrightness = scale(1024, 3, 0, 255, true);
-auto sliderToColorPalette = scale(972, 5, 8, 0, true);
-auto sliderToSpeed = scale(1000, 0, 1, 10, true);
 
 void cycleBackgroundViz() {
   int len = sizeof(backgrounds) / sizeof(backgrounds[0]);
