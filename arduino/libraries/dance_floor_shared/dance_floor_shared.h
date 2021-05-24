@@ -5,10 +5,11 @@
 #define ACTION_SET_BACKGROUND    1
 #define ACTION_RIPPLE            2
 #define ACTION_SET_BRIGHTNESS    3
-#define ACTION_WINDSHIELD        4
+#define ACTION_WIPE              4
 #define ACTION_SET_PALETTE       5
 #define ACTION_CYCLE_PALETTE     6
 #define ACTION_SPEED             7
+#define ACTION_STROBE            8
 
 #define VIZ_DEFAULT   0
 #define VIZ_PRIDE     1

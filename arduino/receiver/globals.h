@@ -7,10 +7,11 @@
 CRGB leds[NUM_STRIPS][NUM_LEDS];
 msg data;
 
-uint8_t stripIndex = NUM_STRIPS;
+uint8_t wipeIndex = NUM_STRIPS;
 uint8_t setBrightness = BRIGHTNESS;
 uint8_t activeViz = 0;
 uint8_t speed = 1;
+uint8_t strobeColor = 0;
 
 int16_t current[NUM_STRIPS][NUM_LEDS];
 int16_t previous[NUM_STRIPS][NUM_LEDS];

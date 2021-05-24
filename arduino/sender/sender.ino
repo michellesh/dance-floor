@@ -15,10 +15,14 @@
 #define GREEN_BUTTON   13  // D7
 #define WHITE_BUTTON   4   // D2
 
+#define BACKGROUND_MODE  0
+#define OVERLAY_MODE     1
+
 int backgrounds[] = {VIZ_PRIDE, VIZ_TWINKLE, VIZ_STARFIELD, VIZ_JUGGLE};
 int activeVizIndex = 0;
 int activePalette = 0;
 int numPalettes = 9;
+int mode = BACKGROUND_MODE;
 
 struct Button {
   int pin;
@@ -36,8 +40,9 @@ msg brightness = {ACTION_SET_BRIGHTNESS};
 msg background = {ACTION_SET_BACKGROUND, VIZ_DEFAULT};
 msg blendPalette = {ACTION_CYCLE_PALETTE};
 msg palette = {ACTION_SET_PALETTE};
-msg windshield = {ACTION_WINDSHIELD};
+msg wipe = {ACTION_WIPE};
 msg speed = {ACTION_SPEED};
+msg strobe = {ACTION_STROBE};
 
 Button redButton = {RED_BUTTON, false};
 Button blueButton = {BLUE_BUTTON, false};
@@ -176,78 +181,72 @@ void loop() {
   }
 
   if (isButtonPressed(redButton) && !redButton.pressed) {
-    Serial.println("Red button pressed (Pride)");
+    Serial.println("Red button pressed (Pride/Wipe)");
     redButton.pressed = true;
 
-    setBackground(VIZ_PRIDE);
-    send(background);
+    if (mode == BACKGROUND_MODE) {
+      setBackground(VIZ_PRIDE);
+      send(background);
+    } else {
+      send(wipe);
+    }
   } else {
     redButton.pressed = false;
   }
 
   if (isButtonPressed(yellowButton) && !yellowButton.pressed) {
-    Serial.println("Yellow button pressed (Twinkle)");
+    Serial.println("Yellow button pressed (Twinkle/Strobe)");
     yellowButton.pressed = true;
 
-    setBackground(VIZ_TWINKLE);
-    send(background);
+    if (mode == BACKGROUND_MODE) {
+      setBackground(VIZ_TWINKLE);
+      send(background);
+    } else {
+      send(strobe);
+    }
   } else {
     yellowButton.pressed = false;
   }
 
   if (isButtonPressed(blueButton) && !blueButton.pressed) {
-    Serial.println("Blue button pressed (Starfield)");
+    Serial.println("Blue button pressed (Starfield/Ripple)");
     blueButton.pressed = true;
 
-    setBackground(VIZ_STARFIELD);
-    send(background);
-  } else {
-    blueButton.pressed = false;
-  }
-
-  if (isButtonPressed(greenButton) && !greenButton.pressed) {
-    Serial.println("Green button pressed (Juggle)");
-    greenButton.pressed = true;
-
-    setBackground(VIZ_JUGGLE);
-    send(background);
-  } else {
-    greenButton.pressed = false;
-  }
-
-  /*
-  if (isButtonPressed(blueButton)) {
-    if (!blueButton.pressed) {
-      Serial.println("Blue button pressed");
-      blueButton.pressed = true;
-
+    if (mode == BACKGROUND_MODE) {
+      setBackground(VIZ_STARFIELD);
+      send(background);
+    } else {
       ripple.value1 = random(1, NUM_STRIPS - 1);
       ripple.value2 = random(1, NUM_LEDS - 1);
-
       send(ripple);
     }
   } else {
     blueButton.pressed = false;
   }
 
-  if (isButtonPressed(greenButton)) {
-    if (!greenButton.pressed) {
-      Serial.println("Green button pressed");
-      greenButton.pressed = true;
-      send(windshield);
+  if (isButtonPressed(greenButton) && !greenButton.pressed) {
+    Serial.println("Green button pressed (Juggle/Clap)");
+    greenButton.pressed = true;
+
+    if (mode == BACKGROUND_MODE) {
+      setBackground(VIZ_JUGGLE);
+      send(background);
+    } else {
+      // TODO clap
     }
   } else {
     greenButton.pressed = false;
   }
-  */
 
   if (isButtonPressed(whiteButton)) {
     if (!whiteButton.pressed) {
-      Serial.println("White button pressed");
+      Serial.println("White button pressed (Overlay mode)");
       whiteButton.pressed = true;
+      mode = OVERLAY_MODE;
     }
   } else if (whiteButton.pressed) {
-    Serial.println("White button UN-pressed");
+    Serial.println("White button UN-pressed (Background mode)");
     whiteButton.pressed = false;
+    mode = BACKGROUND_MODE;
   }
 }

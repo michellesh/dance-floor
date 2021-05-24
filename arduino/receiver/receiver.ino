@@ -78,8 +78,8 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
   Serial.print("Bytes received: ");
   Serial.println(len);
 
-  if (data.action == ACTION_WINDSHIELD) {
-    stripIndex = 0;
+  if (data.action == ACTION_WIPE) {
+    wipeIndex = 0;
   } else if (data.action == ACTION_RIPPLE) {
     Serial.print("RIPPLE: ");
     Serial.print(data.value1);
@@ -106,6 +106,9 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
     Serial.print("ACTION_SPEED ");
     Serial.println(data.value1);
     speed = data.value1;
+  } else if (data.action == ACTION_STROBE) {
+    Serial.print("ACTION_STROBE ");
+    strobeColor = 255;
   }
 }
 
@@ -130,12 +133,24 @@ void loop() {
     viz_juggle();
   }
 
-  if (stripIndex < NUM_STRIPS) {
-    set_strip(stripIndex, CRGB::White);
-    stripIndex += 1;
+  // Wipe
+  if (wipeIndex < NUM_STRIPS) {
+    set_strip(wipeIndex, CRGB::White);
+    wipeIndex += 1;
   }
 
+  // Ripple
   viz_ripple();
+
+  // Strobe
+  if (strobeColor >= 10) {
+    for (uint16_t i = 0; i < NUM_STRIPS; i++) {
+      for (uint16_t j = 0; j < NUM_LEDS; j++) {
+        nblend(leds[i][j], CRGB(strobeColor, strobeColor, strobeColor), 64);
+      }
+    }
+    strobeColor -= 10;
+  }
 
   for (int i = 0; i < NUM_STRIPS; i++) {
     for (int j = 0; j < NUM_LEDS; j++) {
