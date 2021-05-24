@@ -2,7 +2,7 @@
 #define NUM_STRIPS      28
 #define STRIPS_PER_SAIL 7
 
-#define ACTION_CYCLE_BACKGROUND  1
+#define ACTION_SET_BACKGROUND    1
 #define ACTION_RIPPLE            2
 #define ACTION_SET_BRIGHTNESS    3
 #define ACTION_WINDSHIELD        4
@@ -10,6 +10,7 @@
 #define ACTION_CYCLE_PALETTE     6
 #define ACTION_SPEED             7
 
+#define VIZ_DEFAULT   0
 #define VIZ_PRIDE     1
 #define VIZ_TWINKLE   2
 #define VIZ_PACIFICA  3

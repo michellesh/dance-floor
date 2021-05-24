@@ -90,8 +90,8 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
     Serial.print("ACTION_SET_BRIGHTNESS: ");
     Serial.println(data.value1);
     setBrightness = (uint8_t)data.value1;
-  } else if (data.action == ACTION_CYCLE_BACKGROUND) {
-    Serial.print("ACTION_CYCLE_BACKGROUND");
+  } else if (data.action == ACTION_SET_BACKGROUND) {
+    Serial.print("ACTION_SET_BACKGROUND");
     Serial.println(data.value1);
     activeViz = data.value1;
   } else if (data.action == ACTION_SET_PALETTE) {
@@ -110,7 +110,9 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
 }
 
 void loop() {
-  if (activeViz == VIZ_PRIDE) {
+  if (activeViz == VIZ_DEFAULT) {
+    set_all(CRGB::Black);
+  } else if (activeViz == VIZ_PRIDE) {
     viz_pride();
   } else if (activeViz == VIZ_TWINKLE) {
     EVERY_N_MILLISECONDS(10) {

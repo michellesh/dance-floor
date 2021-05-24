@@ -4,21 +4,21 @@
 #include <FastLED.h>
 #include <espnow.h>
 
-#define SLIDER_1     15 // D8
-#define SLIDER_2     5  // D1
-#define SLIDER_3     16 // D0
-#define SLIDER_4     0  // D3
+#define SLIDER_1       15  // D8
+#define SLIDER_2       5   // D1
+#define SLIDER_3       16  // D0
+#define SLIDER_4       0   // D3
 
-#define RED_BUTTON     2  // D4
-#define BLUE_BUTTON    14 // D5
-#define YELLOW_BUTTON  12 // D6
-#define GREEN_BUTTON   13 // D7
-#define WHITE_BUTTON   4  // D2
+#define RED_BUTTON     2   // D4
+#define BLUE_BUTTON    14  // D5
+#define YELLOW_BUTTON  12  // D6
+#define GREEN_BUTTON   13  // D7
+#define WHITE_BUTTON   4   // D2
 
-int backgrounds[] = {VIZ_PRIDE, VIZ_TWINKLE, VIZ_PACIFICA, VIZ_STARFIELD, VIZ_BPM, VIZ_JUGGLE};
+int backgrounds[] = {VIZ_PRIDE, VIZ_TWINKLE, VIZ_STARFIELD, VIZ_JUGGLE};
 int activeVizIndex = 0;
 int activePalette = 0;
-int numberOfPalettes = 9;
+int numPalettes = 9;
 
 struct Button {
   int pin;
@@ -33,7 +33,7 @@ struct Slider {
 
 msg ripple = {ACTION_RIPPLE};
 msg brightness = {ACTION_SET_BRIGHTNESS};
-msg background = {ACTION_CYCLE_BACKGROUND, VIZ_PRIDE};
+msg background = {ACTION_SET_BACKGROUND, VIZ_DEFAULT};
 msg blendPalette = {ACTION_CYCLE_PALETTE};
 msg palette = {ACTION_SET_PALETTE};
 msg windshield = {ACTION_WINDSHIELD};
@@ -88,16 +88,6 @@ void setup() {
   pinMode(A0, INPUT);
 }
 
-void cycleBackgroundViz() {
-  int len = sizeof(backgrounds) / sizeof(backgrounds[0]);
-  activeVizIndex = activeVizIndex < len - 1 ? activeVizIndex + 1 : 0;
-  background.value1 = backgrounds[activeVizIndex];
-  Serial.print("New background: ");
-  Serial.print(background.value1);
-  Serial.print(" index ");
-  Serial.println(activeVizIndex);
-}
-
 bool isButtonPressed(Button button) {
   return digitalRead(button.pin) == 0;
 }
@@ -115,16 +105,31 @@ bool sliderValueChanged(Slider slider) {
   return slider.value < (slider.prev - BUFFER) || slider.value > (slider.prev + BUFFER);
 }
 
+void setBackground(int viz) {
+  background.value1 = background.value1 == viz ? VIZ_DEFAULT : viz;
+}
+
+void cycleBackground() {
+  int numBackgrounds = sizeof(backgrounds) / sizeof(backgrounds[0]);
+  int currentIndex = 0;
+  for (int i = 0; i < numBackgrounds; i++) {
+    if (backgrounds[i] == background.value1) {
+      currentIndex = i;
+    }
+  }
+  int newIndex = currentIndex < numBackgrounds - 1 ? currentIndex + 1 : 0;
+  background.value1 = backgrounds[newIndex];
+}
+
 void loop() {
   // Every N seconds, cycle through the active background viz
   EVERY_N_SECONDS(120) {
-    cycleBackgroundViz();
+    cycleBackground();
     send(background);
   }
 
   EVERY_N_SECONDS(10) {
-    activePalette = activePalette == numberOfPalettes - 1 ? 0
-                    : activePalette + 1;
+    activePalette = activePalette == numPalettes - 1 ? 0 : activePalette + 1;
     blendPalette.value1 = activePalette;
     send(blendPalette);
   }
@@ -170,18 +175,47 @@ void loop() {
     slider4.prev = slider4.value;
   }
 
-  if (isButtonPressed(yellowButton)) {
-    if (!yellowButton.pressed) {
-      Serial.println("Yellow button pressed");
-      yellowButton.pressed = true;
+  if (isButtonPressed(redButton) && !redButton.pressed) {
+    Serial.println("Red button pressed (Pride)");
+    redButton.pressed = true;
 
-      cycleBackgroundViz();
-      send(background);
-    }
+    setBackground(VIZ_PRIDE);
+    send(background);
+  } else {
+    redButton.pressed = false;
+  }
+
+  if (isButtonPressed(yellowButton) && !yellowButton.pressed) {
+    Serial.println("Yellow button pressed (Twinkle)");
+    yellowButton.pressed = true;
+
+    setBackground(VIZ_TWINKLE);
+    send(background);
   } else {
     yellowButton.pressed = false;
   }
 
+  if (isButtonPressed(blueButton) && !blueButton.pressed) {
+    Serial.println("Blue button pressed (Starfield)");
+    blueButton.pressed = true;
+
+    setBackground(VIZ_STARFIELD);
+    send(background);
+  } else {
+    blueButton.pressed = false;
+  }
+
+  if (isButtonPressed(greenButton) && !greenButton.pressed) {
+    Serial.println("Green button pressed (Juggle)");
+    greenButton.pressed = true;
+
+    setBackground(VIZ_JUGGLE);
+    send(background);
+  } else {
+    greenButton.pressed = false;
+  }
+
+  /*
   if (isButtonPressed(blueButton)) {
     if (!blueButton.pressed) {
       Serial.println("Blue button pressed");
@@ -205,22 +239,15 @@ void loop() {
   } else {
     greenButton.pressed = false;
   }
-
-  if (isButtonPressed(redButton)) {
-    if (!redButton.pressed) {
-      Serial.println("Red button pressed");
-      redButton.pressed = true;
-    }
-  } else {
-    redButton.pressed = false;
-  }
+  */
 
   if (isButtonPressed(whiteButton)) {
     if (!whiteButton.pressed) {
       Serial.println("White button pressed");
       whiteButton.pressed = true;
     }
-  } else {
+  } else if (whiteButton.pressed) {
+    Serial.println("White button UN-pressed");
     whiteButton.pressed = false;
   }
 }
