@@ -158,7 +158,7 @@ void loop() {
   // Wipe
   if (wipeIndex < NUM_STRIPS) {
     set_strip(wipeIndex, currentColor, setBrightness);
-    wipeIndex += 1;
+    wipeIndex += map(speed, 1, 10, 1, 5);
   }
 
   // Ripple
@@ -173,7 +173,7 @@ void loop() {
   for (int i = 0; i < numEchos; i++) {
     if (echos[i] < NUM_LEDS) {
       set_index(echos[i], currentColor, setBrightness);
-      echos[i] += 5;
+      echos[i] += speed;
     }
   }
 
