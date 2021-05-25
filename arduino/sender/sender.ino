@@ -24,6 +24,18 @@ int activePalette = 0;
 int numPalettes = 9;
 int mode = BACKGROUND_MODE;
 int sliderIndex = -1;
+unsigned long backgroundCycleTime = 1000 * 60 * 4; // 4 minutes
+
+struct Timer {
+  unsigned long totalCycleTime;
+  unsigned long lastCycleTime;
+  void reset() {
+    lastCycleTime = millis();
+  };
+  bool complete() {
+    return (millis() - lastCycleTime) > totalCycleTime;
+  };
+};
 
 struct Button {
   int pin;
@@ -59,13 +71,11 @@ Slider slider2 = {SLIDER_2};
 Slider slider3 = {SLIDER_3};
 Slider slider4 = {SLIDER_4};
 
+Timer backgroundTimer = {backgroundCycleTime, 0};
+
 auto sliderToBrightness = scale(1024, 3, 0, 255, true);
 auto sliderToColorPalette = scale(972, 5, 8, 0, true);
 auto sliderToSpeed = scale(1000, 0, 1, 10, true);
-
-void send(msg m) {
-  esp_now_send(0, (uint8_t *) &m, sizeof(m));
-}
 
 void setup() {
   Serial.begin(115200);
@@ -97,6 +107,10 @@ void setup() {
   pinMode(A0, INPUT);
 }
 
+void send(msg m) {
+  esp_now_send(0, (uint8_t *) &m, sizeof(m));
+}
+
 bool isButtonPressed(Button button) {
   return digitalRead(button.pin) == 0;
 }
@@ -122,12 +136,12 @@ void cycleBackground() {
   background.value1 = backgrounds[newIndex];
 }
 
-
 void loop() {
   // Every N seconds, cycle through the active background viz
-  EVERY_N_SECONDS(240) {
+  if (backgroundTimer.complete()) {
     cycleBackground();
     send(background);
+    backgroundTimer.reset();
   }
 
   EVERY_N_SECONDS(10) {
@@ -209,6 +223,7 @@ void loop() {
         if (mode == BACKGROUND_MODE) {
           setBackground(VIZ_PRIDE);
           send(background);
+          backgroundTimer.reset();
         } else {
           send(wipe);
         }
@@ -225,6 +240,7 @@ void loop() {
         if (mode == BACKGROUND_MODE) {
           setBackground(VIZ_TWINKLE);
           send(background);
+          backgroundTimer.reset();
         } else {
           send(strobeOn);
         }
@@ -243,6 +259,7 @@ void loop() {
         if (mode == BACKGROUND_MODE) {
           setBackground(VIZ_STARFIELD);
           send(background);
+          backgroundTimer.reset();
         } else {
           ripple.value1 = random(1, NUM_STRIPS - 1);
           ripple.value2 = random(1, NUM_LEDS - 1);
@@ -261,6 +278,7 @@ void loop() {
         if (mode == BACKGROUND_MODE) {
           setBackground(VIZ_JUGGLE);
           send(background);
+          backgroundTimer.reset();
         } else {
           send(echo);
         }
