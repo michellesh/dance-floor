@@ -113,6 +113,8 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
   } else if (data.action == ACTION_STROBE_OFF) {
     Serial.print("ACTION_STROBE_OFF");
     strobeOn = false;
+  } else if (data.action == ACTION_ECHO) {
+    echoIndex = 0;
   }
 }
 
@@ -129,7 +131,7 @@ void loop() {
   } else if (activeViz == VIZ_PACIFICA) {
     viz_pacifica();
   } else if (activeViz == VIZ_STARFIELD) {
-    viz_starfield(mapf(speed, 1, 10, 0.5, 9));
+    viz_starfield(currentColor, mapf(speed, 1, 10, 0.5, 9));
   } else if (activeViz == VIZ_BPM) {
     EVERY_N_MILLISECONDS(20) { gHue++; } // slowly cycle the "base color" through the rainbow
     bpm();
@@ -139,7 +141,7 @@ void loop() {
 
   // Wipe
   if (wipeIndex < NUM_STRIPS) {
-    set_strip(wipeIndex, CRGB::White);
+    set_strip(wipeIndex, currentColor);
     wipeIndex += 1;
   }
 
@@ -151,6 +153,13 @@ void loop() {
     set_all(currentColor);
   }
 
+  // Echo
+  if (echoIndex < NUM_LEDS) {
+    set_index(echoIndex, currentColor);
+    echoIndex += 5;
+  }
+
+  // Brightness
   for (int i = 0; i < NUM_STRIPS; i++) {
     for (int j = 0; j < NUM_LEDS; j++) {
       leds[i][j].nscale8(setBrightness);

@@ -45,6 +45,7 @@ msg wipe = {ACTION_WIPE};
 msg speed = {ACTION_SPEED};
 msg strobeOn = {ACTION_STROBE_ON};
 msg strobeOff = {ACTION_STROBE_OFF};
+msg echo = {ACTION_ECHO};
 
 Button redButton = {RED_BUTTON, false};
 Button blueButton = {BLUE_BUTTON, false};
@@ -249,14 +250,14 @@ void loop() {
 
     if (isButtonPressed(greenButton)) {
       if (!greenButton.pressed) {
-        Serial.println("Green button pressed (Juggle/Clap)");
+        Serial.println("Green button pressed (Juggle/Echo)");
         greenButton.pressed = true;
 
         if (mode == BACKGROUND_MODE) {
           setBackground(VIZ_JUGGLE);
           send(background);
         } else {
-          // TODO clap
+          send(echo);
         }
       }
     } else {

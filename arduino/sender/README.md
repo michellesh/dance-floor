@@ -19,7 +19,7 @@
 |   \   \   \   \   \           |
 +----\---\---\---\---\----------+
       \   \   \   \   \
-       \   \   \   \   Green: Juggle / Clap
+       \   \   \   \   Green: Juggle / Echo
         \   \   \   \
          \   \   \   Yellow: Twinkle / Strobe
           \   \   \

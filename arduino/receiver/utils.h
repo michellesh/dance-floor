@@ -20,6 +20,12 @@ void set_strip(uint8_t strip_number, CRGB color, uint8_t num_leds = NUM_LEDS) {
   }
 }
 
+void set_index(int index, CRGB color) {
+  for (uint16_t i = 0; i < NUM_STRIPS; i++) {
+    leds[i][index] = color;
+  }
+}
+
 float mapf(float value, float inMin, float inMax, float outMin, float outMax) {
   float percentage = (value - inMin) / (inMax - inMin);
   return outMin + (outMax - outMin) * percentage;

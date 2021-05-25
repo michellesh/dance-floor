@@ -7,6 +7,7 @@
 CRGB leds[NUM_STRIPS][NUM_LEDS];
 msg data;
 
+uint8_t echoIndex = NUM_LEDS;
 uint8_t wipeIndex = NUM_STRIPS;
 uint8_t setBrightness = BRIGHTNESS;
 uint8_t activeViz = 0;

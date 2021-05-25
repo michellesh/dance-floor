@@ -24,7 +24,7 @@ void viz_ripple(CRGB color) {
       int16_t value = convert(current[i][j]);
       if (value > 0) {
         leds[i][j] = color;
-        leds[i][j].fadeLightBy(255 - value);
+        leds[i][j].nscale8(value);
       }
     }
   }
