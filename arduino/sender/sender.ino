@@ -23,6 +23,7 @@ int activeVizIndex = 0;
 int activePalette = 0;
 int numPalettes = 9;
 int mode = BACKGROUND_MODE;
+int sliderIndex = -1;
 
 struct Button {
   int pin;
@@ -97,14 +98,6 @@ bool isButtonPressed(Button button) {
   return digitalRead(button.pin) == 0;
 }
 
-int getSliderValue(Slider slider) {
-  digitalWrite(slider.pin, HIGH);
-  delay(100);
-  int sliderValue = analogRead(0);
-  digitalWrite(slider.pin, LOW);
-  return sliderValue;
-}
-
 bool sliderValueChanged(Slider slider) {
   int BUFFER = 20;
   return slider.value < (slider.prev - BUFFER) || slider.value > (slider.prev + BUFFER);
@@ -126,6 +119,7 @@ void cycleBackground() {
   background.value1 = backgrounds[newIndex];
 }
 
+
 void loop() {
   // Every N seconds, cycle through the active background viz
   EVERY_N_SECONDS(120) {
@@ -139,7 +133,29 @@ void loop() {
     send(blendPalette);
   }
 
-  slider1.value = getSliderValue(slider1);
+  EVERY_N_MILLISECONDS(100) {
+    if (sliderIndex == -1) {
+      digitalWrite(slider1.pin, HIGH);
+    } else if (sliderIndex == 0) {
+      slider1.value = analogRead(0);
+      digitalWrite(slider1.pin, LOW);
+      digitalWrite(slider2.pin, HIGH);
+    } else if (sliderIndex == 1) {
+      slider2.value = analogRead(0);
+      digitalWrite(slider2.pin, LOW);
+      digitalWrite(slider3.pin, HIGH);
+    } else if (sliderIndex == 2) {
+      slider3.value = analogRead(0);
+      digitalWrite(slider3.pin, LOW);
+      digitalWrite(slider4.pin, HIGH);
+    } else if (sliderIndex == 3) {
+      slider4.value = analogRead(0);
+      digitalWrite(slider4.pin, LOW);
+      digitalWrite(slider1.pin, HIGH);
+    }
+    sliderIndex = sliderIndex == 3 ? 0 : sliderIndex + 1;
+  }
+
   if (sliderValueChanged(slider1)) {
     Serial.print("Slider 1 changed ");
     Serial.println(slider1.value);
@@ -150,7 +166,6 @@ void loop() {
     slider1.prev = slider1.value;
   }
 
-  slider2.value = getSliderValue(slider2);
   if (sliderValueChanged(slider2)) {
     Serial.print("Slider 2 changed ");
     Serial.println(slider2.value);
@@ -162,7 +177,6 @@ void loop() {
     slider2.prev = slider2.value;
   }
 
-  slider3.value = getSliderValue(slider3);
   if (sliderValueChanged(slider3)) {
     Serial.print("Slider 3 changed ");
     Serial.println(slider3.value);
@@ -173,80 +187,89 @@ void loop() {
     slider3.prev = slider3.value;
   }
 
-  slider4.value = getSliderValue(slider4);
   if (sliderValueChanged(slider4)) {
     Serial.print("Slider 4 changed ");
     Serial.println(slider4.value);
     slider4.prev = slider4.value;
   }
 
-  if (isButtonPressed(redButton) && !redButton.pressed) {
-    Serial.println("Red button pressed (Pride/Wipe)");
-    redButton.pressed = true;
+  EVERY_N_MILLISECONDS(5) {
+    if (isButtonPressed(redButton)) {
+      if (!redButton.pressed) {
+        Serial.println("Red button pressed (Pride/Wipe)");
+        redButton.pressed = true;
 
-    if (mode == BACKGROUND_MODE) {
-      setBackground(VIZ_PRIDE);
-      send(background);
+        if (mode == BACKGROUND_MODE) {
+          setBackground(VIZ_PRIDE);
+          send(background);
+        } else {
+          send(wipe);
+        }
+      }
     } else {
-      send(wipe);
+      redButton.pressed = false;
     }
-  } else {
-    redButton.pressed = false;
-  }
 
-  if (isButtonPressed(yellowButton) && !yellowButton.pressed) {
-    Serial.println("Yellow button pressed (Twinkle/Strobe)");
-    yellowButton.pressed = true;
+    if (isButtonPressed(yellowButton)) {
+      if (!yellowButton.pressed) {
+        Serial.println("Yellow button pressed (Twinkle/Strobe)");
+        yellowButton.pressed = true;
 
-    if (mode == BACKGROUND_MODE) {
-      setBackground(VIZ_TWINKLE);
-      send(background);
+        if (mode == BACKGROUND_MODE) {
+          setBackground(VIZ_TWINKLE);
+          send(background);
+        } else {
+          send(strobe);
+        }
+      }
     } else {
-      send(strobe);
+      yellowButton.pressed = false;
     }
-  } else {
-    yellowButton.pressed = false;
-  }
 
-  if (isButtonPressed(blueButton) && !blueButton.pressed) {
-    Serial.println("Blue button pressed (Starfield/Ripple)");
-    blueButton.pressed = true;
+    if (isButtonPressed(blueButton)) {
+      if (!blueButton.pressed) {
+        Serial.println("Blue button pressed (Starfield/Ripple)");
+        blueButton.pressed = true;
 
-    if (mode == BACKGROUND_MODE) {
-      setBackground(VIZ_STARFIELD);
-      send(background);
+        if (mode == BACKGROUND_MODE) {
+          setBackground(VIZ_STARFIELD);
+          send(background);
+        } else {
+          ripple.value1 = random(1, NUM_STRIPS - 1);
+          ripple.value2 = random(1, NUM_LEDS - 1);
+          send(ripple);
+        }
+      }
     } else {
-      ripple.value1 = random(1, NUM_STRIPS - 1);
-      ripple.value2 = random(1, NUM_LEDS - 1);
-      send(ripple);
+      blueButton.pressed = false;
     }
-  } else {
-    blueButton.pressed = false;
-  }
 
-  if (isButtonPressed(greenButton) && !greenButton.pressed) {
-    Serial.println("Green button pressed (Juggle/Clap)");
-    greenButton.pressed = true;
+    if (isButtonPressed(greenButton)) {
+      if (!greenButton.pressed) {
+        Serial.println("Green button pressed (Juggle/Clap)");
+        greenButton.pressed = true;
 
-    if (mode == BACKGROUND_MODE) {
-      setBackground(VIZ_JUGGLE);
-      send(background);
+        if (mode == BACKGROUND_MODE) {
+          setBackground(VIZ_JUGGLE);
+          send(background);
+        } else {
+          // TODO clap
+        }
+      }
     } else {
-      // TODO clap
+      greenButton.pressed = false;
     }
-  } else {
-    greenButton.pressed = false;
-  }
 
-  if (isButtonPressed(whiteButton)) {
-    if (!whiteButton.pressed) {
-      Serial.println("White button pressed (Overlay mode)");
-      whiteButton.pressed = true;
-      mode = OVERLAY_MODE;
+    if (isButtonPressed(whiteButton)) {
+      if (!whiteButton.pressed) {
+        Serial.println("White button pressed (Overlay mode)");
+        whiteButton.pressed = true;
+        mode = OVERLAY_MODE;
+      }
+    } else if (whiteButton.pressed) {
+      Serial.println("White button UN-pressed (Background mode)");
+      whiteButton.pressed = false;
+      mode = BACKGROUND_MODE;
     }
-  } else if (whiteButton.pressed) {
-    Serial.println("White button UN-pressed (Background mode)");
-    whiteButton.pressed = false;
-    mode = BACKGROUND_MODE;
   }
 }
