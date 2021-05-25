@@ -98,13 +98,14 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
     Serial.print("ACTION_SET_BACKGROUND");
     Serial.println(data.value1);
     activeViz = data.value1;
+  } else if (data.action == ACTION_SET_HUE) {
+    Serial.print("ACTION_SET_HUE ");
+    Serial.println(data.value1);
+    int paletteIndex = map(data.value1, 0, 255, 0, 8);
+    gCurrentPalette = *(ActivePaletteList[paletteIndex]);
+    currentColor = CHSV(data.value1, 255, 255);
   } else if (data.action == ACTION_SET_PALETTE) {
     Serial.print("ACTION_SET_PALETTE ");
-    Serial.println(data.value1);
-    gCurrentPalette = *(ActivePaletteList[data.value1]);
-    currentColor = colorList[data.value1];
-  } else if (data.action == ACTION_CYCLE_PALETTE) {
-    Serial.print("ACTION_CYCLE_PALETTE ");
     Serial.println(data.value1);
     gTargetPalette = *(ActivePaletteList[data.value1]);
   } else if (data.action == ACTION_SPEED) {
@@ -128,6 +129,7 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
 }
 
 void loop() {
+  // Background pattern
   if (activeViz == VIZ_DEFAULT) {
     set_all(CRGB::Black, 0);
   } else if (activeViz == VIZ_PRIDE) {
@@ -142,7 +144,9 @@ void loop() {
   } else if (activeViz == VIZ_STARFIELD) {
     viz_starfield(currentColor, mapf(speed, 1, 10, 0.5, 9));
   } else if (activeViz == VIZ_BPM) {
-    EVERY_N_MILLISECONDS(20) { gHue++; } // slowly cycle the "base color" through the rainbow
+    EVERY_N_MILLISECONDS(20) {
+      gHue++;
+    }
     bpm();
   } else if (activeViz == VIZ_JUGGLE) {
     viz_juggle();

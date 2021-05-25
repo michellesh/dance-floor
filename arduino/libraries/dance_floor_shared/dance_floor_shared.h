@@ -7,7 +7,7 @@
 #define ACTION_SET_BRIGHTNESS     3
 #define ACTION_WIPE               4
 #define ACTION_SET_PALETTE        5
-#define ACTION_CYCLE_PALETTE      6
+#define ACTION_SET_HUE            6
 #define ACTION_SPEED              7
 #define ACTION_STROBE_ON          8
 #define ACTION_STROBE_OFF         9

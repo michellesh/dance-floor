@@ -21,6 +21,7 @@
 int backgrounds[] = {VIZ_PRIDE, VIZ_TWINKLE, VIZ_STARFIELD, VIZ_JUGGLE};
 int activeVizIndex = 0;
 int activePalette = 0;
+int activeHue = 0;
 int numPalettes = 9;
 int mode = BACKGROUND_MODE;
 int sliderIndex = -1;
@@ -52,8 +53,8 @@ msg ripple = {ACTION_RIPPLE};
 msg backgroundBrightness = {ACTION_SET_BG_BRIGHTNESS};
 msg brightness = {ACTION_SET_BRIGHTNESS};
 msg background = {ACTION_SET_BACKGROUND, VIZ_DEFAULT};
-msg blendPalette = {ACTION_CYCLE_PALETTE};
 msg palette = {ACTION_SET_PALETTE};
+msg hue = {ACTION_SET_HUE};
 msg wipe = {ACTION_WIPE};
 msg speed = {ACTION_SPEED};
 msg strobeOn = {ACTION_STROBE_ON};
@@ -73,8 +74,8 @@ Slider slider4 = {SLIDER_4};
 
 Timer backgroundTimer = {backgroundCycleTime, 0};
 
-auto sliderToBrightness = scale(1024, 3, 0, 255, true);
-auto sliderToColorPalette = scale(972, 5, 8, 0, true);
+auto sliderToBrightness = scale(1000, 50, 0, 255, true);
+auto sliderToHue = scale(900, 50, 255, 0, true);
 auto sliderToSpeed = scale(1000, 0, 1, 10, true);
 
 void setup() {
@@ -146,8 +147,8 @@ void loop() {
 
   EVERY_N_SECONDS(10) {
     activePalette = activePalette == numPalettes - 1 ? 0 : activePalette + 1;
-    blendPalette.value1 = activePalette;
-    send(blendPalette);
+    palette.value1 = activePalette;
+    send(palette);
   }
 
   EVERY_N_MILLISECONDS(100) {
@@ -196,11 +197,11 @@ void loop() {
   if (sliderValueChanged(slider3)) {
     Serial.print("Slider 3 changed ");
     Serial.println(slider3.value);
-    activePalette = sliderToColorPalette(slider3.value);
-    palette.value1 = activePalette;
-    Serial.print("Palette ");
-    Serial.println(palette.value1);
-    send(palette);
+    activeHue = sliderToHue(slider3.value);
+    hue.value1 = activeHue;
+    Serial.print("Hue ");
+    Serial.println(hue.value1);
+    send(hue);
     slider3.prev = slider3.value;
   }
 

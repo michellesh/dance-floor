@@ -5,13 +5,13 @@
                     /
                    /       White: Hold for Overlay Mode
                   /       /
-                 /       /    Slider 3: Color
+                 /       /    Slider 3: Color Palette / Hue
                 /       /    /
                /       /    /   Slider 4: Speed
               /       /    /   /
 +------------/-------/----/---/-+
 |           /       /    /   /  |
-|  |   |  (R)  o  (W)   |   |   |
+|  |   |  (R)  .  (W)   |   |   |
 |  |   |               [=]  |   |
 | [=]  |                |  [=]  |
 |  |  [=]     (Y)       |   |   |
