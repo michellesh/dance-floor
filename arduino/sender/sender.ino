@@ -37,6 +37,7 @@ struct Slider {
 };
 
 msg ripple = {ACTION_RIPPLE};
+msg backgroundBrightness = {ACTION_SET_BG_BRIGHTNESS};
 msg brightness = {ACTION_SET_BRIGHTNESS};
 msg background = {ACTION_SET_BACKGROUND, VIZ_DEFAULT};
 msg blendPalette = {ACTION_CYCLE_PALETTE};
@@ -124,7 +125,7 @@ void cycleBackground() {
 
 void loop() {
   // Every N seconds, cycle through the active background viz
-  EVERY_N_SECONDS(120) {
+  EVERY_N_SECONDS(240) {
     cycleBackground();
     send(background);
   }
@@ -161,37 +162,41 @@ void loop() {
   if (sliderValueChanged(slider1)) {
     Serial.print("Slider 1 changed ");
     Serial.println(slider1.value);
-    brightness.value1 = sliderToBrightness(slider1.value);
+    backgroundBrightness.value1 = sliderToBrightness(slider1.value);
     Serial.print("Brightness ");
-    Serial.println(brightness.value1);
-    send(brightness);
+    Serial.println(backgroundBrightness.value1);
+    send(backgroundBrightness);
     slider1.prev = slider1.value;
   }
 
   if (sliderValueChanged(slider2)) {
     Serial.print("Slider 2 changed ");
     Serial.println(slider2.value);
-    activePalette = sliderToColorPalette(slider2.value);
-    palette.value1 = activePalette;
-    Serial.print("Palette ");
-    Serial.println(palette.value1);
-    send(palette);
+    brightness.value1 = sliderToBrightness(slider2.value);
+    Serial.print("Brightness ");
+    Serial.println(brightness.value1);
+    send(brightness);
     slider2.prev = slider2.value;
   }
 
   if (sliderValueChanged(slider3)) {
     Serial.print("Slider 3 changed ");
     Serial.println(slider3.value);
-    speed.value1 = sliderToSpeed(slider3.value);
-    Serial.print("Speed ");
-    Serial.println(speed.value1);
-    send(speed);
+    activePalette = sliderToColorPalette(slider3.value);
+    palette.value1 = activePalette;
+    Serial.print("Palette ");
+    Serial.println(palette.value1);
+    send(palette);
     slider3.prev = slider3.value;
   }
 
   if (sliderValueChanged(slider4)) {
     Serial.print("Slider 4 changed ");
     Serial.println(slider4.value);
+    speed.value1 = sliderToSpeed(slider4.value);
+    Serial.print("Speed ");
+    Serial.println(speed.value1);
+    send(speed);
     slider4.prev = slider4.value;
   }
 

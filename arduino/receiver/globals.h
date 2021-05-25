@@ -10,6 +10,7 @@ msg data;
 uint8_t echoIndex = NUM_LEDS;
 uint8_t wipeIndex = NUM_STRIPS;
 uint8_t setBrightness = BRIGHTNESS;
+uint8_t setBackgroundBrightness = BRIGHTNESS;
 uint8_t activeViz = 0;
 uint8_t speed = 1;
 bool strobeOn = false;

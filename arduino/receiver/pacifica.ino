@@ -27,7 +27,7 @@ void viz_pacifica() {
   sCIStart4 -= (deltams2 * beatsin88(257, 4, 6));
 
   // Clear out the LED array to a dim background blue-green
-  set_all(CRGB(2, 6, 10));
+  set_all(CRGB(2, 6, 10), 255);
 
   // Render each of four layers, with different scales and speeds, that vary over time
   pacifica_one_layer(pacifica_palette_1, sCIStart1, beatsin16(3, 11 * 256, 14 * 256), beatsin8(10, 70, 130), 0-beat16(301));

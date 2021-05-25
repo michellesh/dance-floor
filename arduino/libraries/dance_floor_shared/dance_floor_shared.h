@@ -2,24 +2,25 @@
 #define NUM_STRIPS      28
 #define STRIPS_PER_SAIL 7
 
-#define ACTION_SET_BACKGROUND    1
-#define ACTION_RIPPLE            2
-#define ACTION_SET_BRIGHTNESS    3
-#define ACTION_WIPE              4
-#define ACTION_SET_PALETTE       5
-#define ACTION_CYCLE_PALETTE     6
-#define ACTION_SPEED             7
-#define ACTION_STROBE_ON         8
-#define ACTION_STROBE_OFF        9
-#define ACTION_ECHO              10
+#define ACTION_SET_BACKGROUND     1
+#define ACTION_RIPPLE             2
+#define ACTION_SET_BRIGHTNESS     3
+#define ACTION_WIPE               4
+#define ACTION_SET_PALETTE        5
+#define ACTION_CYCLE_PALETTE      6
+#define ACTION_SPEED              7
+#define ACTION_STROBE_ON          8
+#define ACTION_STROBE_OFF         9
+#define ACTION_ECHO               10
+#define ACTION_SET_BG_BRIGHTNESS  11
 
-#define VIZ_DEFAULT   0
-#define VIZ_PRIDE     1
-#define VIZ_TWINKLE   2
-#define VIZ_PACIFICA  3
-#define VIZ_STARFIELD 4
-#define VIZ_BPM       5
-#define VIZ_JUGGLE    6
+#define VIZ_DEFAULT    0
+#define VIZ_PRIDE      1
+#define VIZ_TWINKLE    2
+#define VIZ_PACIFICA   3
+#define VIZ_STARFIELD  4
+#define VIZ_BPM        5
+#define VIZ_JUGGLE     6
 
 typedef struct msg {
   uint8_t action;

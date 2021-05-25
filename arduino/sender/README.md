@@ -3,11 +3,11 @@
 ```
                      Red: Pride / Wipe
                     /
-                   /       White: Overlay Mode (hold)
+                   /       White: Hold for Overlay Mode
                   /       /
                  /       /    Slider 3: Color
                 /       /    /
-               /       /    /   Slider 4: Speed / Quantity
+               /       /    /   Slider 4: Speed
               /       /    /   /
 +------------/-------/----/---/-+
 |           /       /    /   /  |

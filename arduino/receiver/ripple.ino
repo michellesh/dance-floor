@@ -10,7 +10,7 @@ uint8_t convert(int16_t value) {
   }
 }
 
-void viz_ripple(CRGB color) {
+void viz_ripple(CRGB color, uint8_t brightness) {
   float DAMPENING = 0.99;
   for (int i = 1; i < NUM_STRIPS - 1; i++) {
     for (int j = 1; j < NUM_LEDS - 1; j++) {
@@ -24,7 +24,7 @@ void viz_ripple(CRGB color) {
       int16_t value = convert(current[i][j]);
       if (value > 0) {
         leds[i][j] = color;
-        leds[i][j].nscale8(value);
+        leds[i][j].nscale8(value).nscale8(brightness);
       }
     }
   }

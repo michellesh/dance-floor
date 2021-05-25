@@ -90,6 +90,10 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
     Serial.print("ACTION_SET_BRIGHTNESS: ");
     Serial.println(data.value1);
     setBrightness = (uint8_t)data.value1;
+  } else if (data.action == ACTION_SET_BG_BRIGHTNESS) {
+    Serial.print("ACTION_SET_BG_BRIGHTNESS: ");
+    Serial.println(data.value1);
+    setBackgroundBrightness = (uint8_t)data.value1;
   } else if (data.action == ACTION_SET_BACKGROUND) {
     Serial.print("ACTION_SET_BACKGROUND");
     Serial.println(data.value1);
@@ -120,7 +124,7 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
 
 void loop() {
   if (activeViz == VIZ_DEFAULT) {
-    set_all(CRGB::Black);
+    set_all(CRGB::Black, 0);
   } else if (activeViz == VIZ_PRIDE) {
     viz_pride();
   } else if (activeViz == VIZ_TWINKLE) {
@@ -139,31 +143,31 @@ void loop() {
     viz_juggle();
   }
 
+  // Background Brightness
+  for (int i = 0; i < NUM_STRIPS; i++) {
+    for (int j = 0; j < NUM_LEDS; j++) {
+      leds[i][j].nscale8(setBackgroundBrightness);
+    }
+  }
+
   // Wipe
   if (wipeIndex < NUM_STRIPS) {
-    set_strip(wipeIndex, currentColor);
+    set_strip(wipeIndex, currentColor, setBrightness);
     wipeIndex += 1;
   }
 
   // Ripple
-  viz_ripple(currentColor);
+  viz_ripple(currentColor, setBrightness);
 
   // Strobe
   if (strobeOn) {
-    set_all(currentColor);
+    set_all(currentColor, setBrightness);
   }
 
   // Echo
   if (echoIndex < NUM_LEDS) {
-    set_index(echoIndex, currentColor);
+    set_index(echoIndex, currentColor, setBrightness);
     echoIndex += 5;
-  }
-
-  // Brightness
-  for (int i = 0; i < NUM_STRIPS; i++) {
-    for (int j = 0; j < NUM_LEDS; j++) {
-      leds[i][j].nscale8(setBrightness);
-    }
   }
 
   FastLED.show();
