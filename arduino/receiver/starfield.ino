@@ -15,9 +15,10 @@ Star stars[NUM_STARS];
 void init_starfield() {
   for (int x = 0; x < NUM_STARS; x++) {
     uint8_t strand = (uint8_t)random(0, NUM_STRIPS);
-    float startY = random(0, NUM_LEDS);
+    float startY = random(-50, NUM_LEDS);
     float endY = random(NUM_LEDS, NUM_LEDS * 2);
-    stars[x] = {strand, startY, startY, endY};
+    float currentY = random(startY, endY);
+    stars[x] = {strand, startY, currentY, endY};
   }
 }
 
@@ -27,15 +28,17 @@ void viz_starfield(CRGB color, float speed) {
     stars[x].currentY += speed * mapf(stars[x].currentY, stars[x].startY, stars[x].endY, MIN_SPEED, MAX_SPEED);
     if (stars[x].currentY >= NUM_LEDS - 1) {
       uint8_t strand = (uint8_t)random(0, NUM_STRIPS);
-      float startY = random(0, NUM_LEDS);
+      float startY = random(-50, NUM_LEDS);
       float endY = random(NUM_LEDS, NUM_LEDS * 2);
       stars[x] = {strand, startY, startY, endY};
     }
     uint8_t value = mapf(stars[x].currentY, stars[x].startY, stars[x].endY, 0, 255);
     int currentY = (int)round(stars[x].currentY);
-    leds[stars[x].strand][currentY] = color;
-    leds[stars[x].strand][currentY].nscale8(value);
-    addTail(stars[x].strand, currentY, value, color);
+    if (currentY >= 0) {
+      leds[stars[x].strand][currentY] = color;
+      leds[stars[x].strand][currentY].nscale8(value);
+      addTail(stars[x].strand, currentY, value, color);
+    }
   }
 }
 
