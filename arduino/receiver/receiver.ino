@@ -98,6 +98,7 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
     Serial.print("ACTION_SET_PALETTE ");
     Serial.println(data.value1);
     gCurrentPalette = *(ActivePaletteList[data.value1]);
+    currentColor = colorList[data.value1];
   } else if (data.action == ACTION_CYCLE_PALETTE) {
     Serial.print("ACTION_CYCLE_PALETTE ");
     Serial.println(data.value1);
@@ -106,9 +107,12 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
     Serial.print("ACTION_SPEED ");
     Serial.println(data.value1);
     speed = data.value1;
-  } else if (data.action == ACTION_STROBE) {
-    Serial.print("ACTION_STROBE ");
-    strobeColor = 255;
+  } else if (data.action == ACTION_STROBE_ON) {
+    Serial.print("ACTION_STROBE_ON");
+    strobeOn = true;
+  } else if (data.action == ACTION_STROBE_OFF) {
+    Serial.print("ACTION_STROBE_OFF");
+    strobeOn = false;
   }
 }
 
@@ -140,16 +144,11 @@ void loop() {
   }
 
   // Ripple
-  viz_ripple();
+  viz_ripple(currentColor);
 
   // Strobe
-  if (strobeColor >= 10) {
-    for (uint16_t i = 0; i < NUM_STRIPS; i++) {
-      for (uint16_t j = 0; j < NUM_LEDS; j++) {
-        nblend(leds[i][j], CRGB(strobeColor, strobeColor, strobeColor), 64);
-      }
-    }
-    strobeColor -= 10;
+  if (strobeOn) {
+    set_all(currentColor);
   }
 
   for (int i = 0; i < NUM_STRIPS; i++) {

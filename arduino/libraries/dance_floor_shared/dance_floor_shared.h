@@ -9,7 +9,8 @@
 #define ACTION_SET_PALETTE       5
 #define ACTION_CYCLE_PALETTE     6
 #define ACTION_SPEED             7
-#define ACTION_STROBE            8
+#define ACTION_STROBE_ON         8
+#define ACTION_STROBE_OFF        9
 
 #define VIZ_DEFAULT   0
 #define VIZ_PRIDE     1

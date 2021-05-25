@@ -43,7 +43,8 @@ msg blendPalette = {ACTION_CYCLE_PALETTE};
 msg palette = {ACTION_SET_PALETTE};
 msg wipe = {ACTION_WIPE};
 msg speed = {ACTION_SPEED};
-msg strobe = {ACTION_STROBE};
+msg strobeOn = {ACTION_STROBE_ON};
+msg strobeOff = {ACTION_STROBE_OFF};
 
 Button redButton = {RED_BUTTON, false};
 Button blueButton = {BLUE_BUTTON, false};
@@ -212,18 +213,20 @@ void loop() {
 
     if (isButtonPressed(yellowButton)) {
       if (!yellowButton.pressed) {
-        Serial.println("Yellow button pressed (Twinkle/Strobe)");
+        Serial.println("Yellow button pressed (Twinkle/Strobe On)");
         yellowButton.pressed = true;
 
         if (mode == BACKGROUND_MODE) {
           setBackground(VIZ_TWINKLE);
           send(background);
         } else {
-          send(strobe);
+          send(strobeOn);
         }
       }
-    } else {
+    } else if (yellowButton.pressed) {
+      Serial.println("Strobe Off");
       yellowButton.pressed = false;
+      send(strobeOff);
     }
 
     if (isButtonPressed(blueButton)) {

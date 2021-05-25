@@ -11,7 +11,7 @@ uint8_t wipeIndex = NUM_STRIPS;
 uint8_t setBrightness = BRIGHTNESS;
 uint8_t activeViz = 0;
 uint8_t speed = 1;
-uint8_t strobeColor = 0;
+bool strobeOn = false;
 
 int16_t current[NUM_STRIPS][NUM_LEDS];
 int16_t previous[NUM_STRIPS][NUM_LEDS];
@@ -23,6 +23,7 @@ uint8_t gHue = 0; // used for bpm pattern
 
 CRGBPalette16 gCurrentPalette;
 CRGBPalette16 gTargetPalette;
+CRGB currentColor = CRGB::White;
 
 #define Bride_Dress   0xDED1D0
 #define Maid_Of_Honor 0x005C49
@@ -113,6 +114,17 @@ const TProgmemRGBPalette16* ActivePaletteList[] = {
   &PurplePink_p,
   &Groomsmen_p,
   &FairyLight_p,
+};
+const CRGB colorList[] = {
+  CRGB::White,
+  CRGB::Red,
+  CRGB::Orange,
+  CRGB::Yellow,
+  CRGB::Green,
+  CRGB::Teal,
+  CRGB::Navy,
+  CRGB::Purple,
+  CRGB::Pink,
 };
 
 // Advance to the next color palette in the list (above).
