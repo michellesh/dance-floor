@@ -118,7 +118,12 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
     Serial.print("ACTION_STROBE_OFF");
     strobeOn = false;
   } else if (data.action == ACTION_ECHO) {
-    echoIndex = 0;
+    for (int i = 0; i < numEchos; i++) {
+      if (echos[i] >= NUM_LEDS) {
+        echos[i] = 0;
+        break;
+      }
+    }
   }
 }
 
@@ -165,9 +170,11 @@ void loop() {
   }
 
   // Echo
-  if (echoIndex < NUM_LEDS) {
-    set_index(echoIndex, currentColor, setBrightness);
-    echoIndex += 5;
+  for (int i = 0; i < numEchos; i++) {
+    if (echos[i] < NUM_LEDS) {
+      set_index(echos[i], currentColor, setBrightness);
+      echos[i] += 5;
+    }
   }
 
   FastLED.show();
