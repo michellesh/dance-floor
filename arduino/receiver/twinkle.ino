@@ -70,7 +70,7 @@ void viz_twinkle(uint8_t speed) {
   
   //for( CRGB& pixel: L) {
   for (uint16_t i = 0; i < NUM_STRIPS; i++) {
-    for (uint16_t j = 0; j < NUM_LEDS; j++) {
+    for (uint16_t j = 0; j < NUM_LEDS[i]; j++) {
 
       PRNG16 = (uint16_t)(PRNG16 * 2053) + 1384; // next 'random' number
       uint16_t myclockoffset16= PRNG16; // use that number as clock offset

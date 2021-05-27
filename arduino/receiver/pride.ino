@@ -1,5 +1,5 @@
-/* Pride visualization
- */
+// Pride visualization
+
 void viz_pride() {
   static uint16_t sPseudotime = 0;
   static uint16_t sLastMillis = 0;
@@ -20,21 +20,21 @@ void viz_pride() {
   sHue16 += deltams * beatsin88(400, 5, 9);
   uint16_t brightnesstheta16 = sPseudotime;
 
-  for (uint16_t i = 0; i < NUM_LEDS * NUM_STRIPS; i++) {
-    hue16 += hueinc16;
-    uint8_t hue8 = hue16 / 256;
+  for (uint16_t i = 0; i < NUM_STRIPS; i++) {
+    for (uint16_t j = 0; j < NUM_LEDS[i]; j++) {
+      hue16 += hueinc16;
+      uint8_t hue8 = hue16 / 256;
 
-    brightnesstheta16 += brightnessthetainc16;
-    uint16_t b16 = sin16(brightnesstheta16) + 32768;
+      brightnesstheta16 += brightnessthetainc16;
+      uint16_t b16 = sin16(brightnesstheta16) + 32768;
 
-    uint16_t bri16 = (uint32_t)((uint32_t)b16 * (uint32_t)b16) / 65536;
-    uint8_t bri8 = (uint32_t)(((uint32_t)bri16) * brightdepth) / 65536;
-    bri8 += (255 - brightdepth);
+      uint16_t bri16 = (uint32_t)((uint32_t)b16 * (uint32_t)b16) / 65536;
+      uint8_t bri8 = (uint32_t)(((uint32_t)bri16) * brightdepth) / 65536;
+      bri8 += (255 - brightdepth);
 
-    CRGB newcolor = CHSV(hue8, sat8, bri8);
+      CRGB newcolor = CHSV(hue8, sat8, bri8);
 
-    uint16_t pixelnumber = (NUM_LEDS * NUM_STRIPS - 1) - i;
-    uint16_t strandnumber = pixelnumber / NUM_LEDS;
-    nblend(leds[strandnumber][pixelnumber - (strandnumber * NUM_LEDS)], newcolor, 64);
+      nblend(leds[i][j], newcolor, 64);
+    }
   }
 }

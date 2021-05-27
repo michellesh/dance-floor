@@ -13,7 +13,7 @@ uint8_t convert(int16_t value) {
 void viz_ripple(CRGB color, uint8_t brightness) {
   float DAMPENING = 0.99;
   for (int i = 1; i < NUM_STRIPS - 1; i++) {
-    for (int j = 1; j < NUM_LEDS - 1; j++) {
+    for (int j = 1; j < NUM_LEDS[i] - 1; j++) {
       current[i][j] = (
         previous[i-1][j] +
         previous[i+1][j] +
@@ -31,7 +31,7 @@ void viz_ripple(CRGB color, uint8_t brightness) {
 
   int16_t temp;
   for (int i = 0; i < NUM_STRIPS; i++) {
-    for (int j = 0; j < NUM_LEDS; j++) {
+    for (int j = 0; j < NUM_LEDS[i]; j++) {
       temp = previous[i][j];
       previous[i][j] = current[i][j];
       current[i][j] = temp;

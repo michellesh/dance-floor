@@ -263,7 +263,7 @@ void loop() {
           backgroundTimer.reset();
         } else {
           ripple.value1 = random(1, NUM_STRIPS - 1);
-          ripple.value2 = random(1, NUM_LEDS - 1);
+          ripple.value2 = random(1, NUM_LEDS[ripple.value1] - 1);
           send(ripple);
         }
       }

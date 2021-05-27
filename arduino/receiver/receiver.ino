@@ -37,32 +37,32 @@ void setup() {
                                                            : 4;
   uint8_t offset = (boardNumber - 1) * STRIPS_PER_SAIL;
 
-  FastLED.addLeds<LED_TYPE, DATA_PIN_2, COLOR_ORDER>(leds[offset], NUM_LEDS)
+  FastLED.addLeds<LED_TYPE, DATA_PIN_2, COLOR_ORDER>(leds[offset], NUM_LEDS[offset])
     .setCorrection(TypicalLEDStrip)
     .setDither(BRIGHTNESS < 255);
-  FastLED.addLeds<LED_TYPE, DATA_PIN_3, COLOR_ORDER>(leds[offset + 1], NUM_LEDS)
+  FastLED.addLeds<LED_TYPE, DATA_PIN_3, COLOR_ORDER>(leds[offset + 1], NUM_LEDS[offset + 1])
     .setCorrection(TypicalLEDStrip)
     .setDither(BRIGHTNESS < 255);
-  FastLED.addLeds<LED_TYPE, DATA_PIN_4, COLOR_ORDER>(leds[offset + 2], NUM_LEDS)
+  FastLED.addLeds<LED_TYPE, DATA_PIN_4, COLOR_ORDER>(leds[offset + 2], NUM_LEDS[offset + 2])
     .setCorrection(TypicalLEDStrip)
     .setDither(BRIGHTNESS < 255);
-  FastLED.addLeds<LED_TYPE, DATA_PIN_5, COLOR_ORDER>(leds[offset + 3], NUM_LEDS)
+  FastLED.addLeds<LED_TYPE, DATA_PIN_5, COLOR_ORDER>(leds[offset + 3], NUM_LEDS[offset + 3])
     .setCorrection(TypicalLEDStrip)
     .setDither(BRIGHTNESS < 255);
-  FastLED.addLeds<LED_TYPE, DATA_PIN_6, COLOR_ORDER>(leds[offset + 4], NUM_LEDS)
+  FastLED.addLeds<LED_TYPE, DATA_PIN_6, COLOR_ORDER>(leds[offset + 4], NUM_LEDS[offset + 4])
     .setCorrection(TypicalLEDStrip)
     .setDither(BRIGHTNESS < 255);
-  FastLED.addLeds<LED_TYPE, DATA_PIN_7, COLOR_ORDER>(leds[offset + 5], NUM_LEDS)
+  FastLED.addLeds<LED_TYPE, DATA_PIN_7, COLOR_ORDER>(leds[offset + 5], NUM_LEDS[offset + 5])
     .setCorrection(TypicalLEDStrip)
     .setDither(BRIGHTNESS < 255);
-  FastLED.addLeds<LED_TYPE, DATA_PIN_8, COLOR_ORDER>(leds[offset + 6], NUM_LEDS)
+  FastLED.addLeds<LED_TYPE, DATA_PIN_8, COLOR_ORDER>(leds[offset + 6], NUM_LEDS[offset + 6])
     .setCorrection(TypicalLEDStrip)
     .setDither(BRIGHTNESS < 255);
 
   FastLED.setBrightness(BRIGHTNESS);
 
   for(int i = 0; i < NUM_STRIPS; i++) {
-    for(int j = 0; j < NUM_LEDS; j++) {
+    for(int j = 0; j < NUM_LEDS[i]; j++) {
       current[i][j] = 0;
       previous[i][j] = 0;
     }
@@ -120,7 +120,7 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
     strobeOn = false;
   } else if (data.action == ACTION_ECHO) {
     for (int i = 0; i < numEchos; i++) {
-      if (echos[i] >= NUM_LEDS) {
+      if (echos[i] >= STRAND_MAX) {
         echos[i] = 0;
         break;
       }
@@ -139,22 +139,15 @@ void loop() {
       nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, 12);
     }
     viz_twinkle(mapf(speed, 1, 10, 4, 9));
-  } else if (activeViz == VIZ_PACIFICA) {
-    viz_pacifica();
   } else if (activeViz == VIZ_STARFIELD) {
     viz_starfield(currentColor, mapf(speed, 1, 10, 0.5, 9));
-  } else if (activeViz == VIZ_BPM) {
-    EVERY_N_MILLISECONDS(20) {
-      gHue++;
-    }
-    bpm();
   } else if (activeViz == VIZ_JUGGLE) {
     viz_juggle();
   }
 
   // Background Brightness
   for (int i = 0; i < NUM_STRIPS; i++) {
-    for (int j = 0; j < NUM_LEDS; j++) {
+    for (int j = 0; j < NUM_LEDS[i]; j++) {
       leds[i][j].nscale8(setBackgroundBrightness);
     }
   }
@@ -175,7 +168,7 @@ void loop() {
 
   // Echo
   for (int i = 0; i < numEchos; i++) {
-    if (echos[i] < NUM_LEDS) {
+    if (echos[i] < STRAND_MAX) {
       set_index(echos[i], currentColor, setBrightness);
       echos[i] += speed;
     }
