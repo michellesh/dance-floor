@@ -151,7 +151,7 @@ void loop() {
     send(palette);
   }
 
-  EVERY_N_MILLISECONDS(100) {
+  EVERY_N_MILLISECONDS(10) {
     if (sliderIndex == -1) {
       digitalWrite(slider1.pin, HIGH);
     } else if (sliderIndex == 0) {
