@@ -7,13 +7,13 @@
 #include <FastLED.h>
 #include <espnow.h>
 
+#define DATA_PIN_1  1
 #define DATA_PIN_2  2
 #define DATA_PIN_3  3
 #define DATA_PIN_4  4
 #define DATA_PIN_5  5
 #define DATA_PIN_6  6
 #define DATA_PIN_7  7
-#define DATA_PIN_8  8
 
 
 void setup() {
@@ -37,25 +37,25 @@ void setup() {
                                                            : 4;
   uint8_t offset = (boardNumber - 1) * STRIPS_PER_SAIL;
 
-  FastLED.addLeds<LED_TYPE, DATA_PIN_2, COLOR_ORDER>(leds[offset], NUM_LEDS[offset])
+  FastLED.addLeds<LED_TYPE, DATA_PIN_1, COLOR_ORDER>(leds[offset], NUM_LEDS[offset])
     .setCorrection(TypicalLEDStrip)
     .setDither(BRIGHTNESS < 255);
-  FastLED.addLeds<LED_TYPE, DATA_PIN_3, COLOR_ORDER>(leds[offset + 1], NUM_LEDS[offset + 1])
+  FastLED.addLeds<LED_TYPE, DATA_PIN_2, COLOR_ORDER>(leds[offset + 1], NUM_LEDS[offset + 1])
     .setCorrection(TypicalLEDStrip)
     .setDither(BRIGHTNESS < 255);
-  FastLED.addLeds<LED_TYPE, DATA_PIN_4, COLOR_ORDER>(leds[offset + 2], NUM_LEDS[offset + 2])
+  FastLED.addLeds<LED_TYPE, DATA_PIN_3, COLOR_ORDER>(leds[offset + 2], NUM_LEDS[offset + 2])
     .setCorrection(TypicalLEDStrip)
     .setDither(BRIGHTNESS < 255);
-  FastLED.addLeds<LED_TYPE, DATA_PIN_5, COLOR_ORDER>(leds[offset + 3], NUM_LEDS[offset + 3])
+  FastLED.addLeds<LED_TYPE, DATA_PIN_4, COLOR_ORDER>(leds[offset + 3], NUM_LEDS[offset + 3])
     .setCorrection(TypicalLEDStrip)
     .setDither(BRIGHTNESS < 255);
-  FastLED.addLeds<LED_TYPE, DATA_PIN_6, COLOR_ORDER>(leds[offset + 4], NUM_LEDS[offset + 4])
+  FastLED.addLeds<LED_TYPE, DATA_PIN_5, COLOR_ORDER>(leds[offset + 4], NUM_LEDS[offset + 4])
     .setCorrection(TypicalLEDStrip)
     .setDither(BRIGHTNESS < 255);
-  FastLED.addLeds<LED_TYPE, DATA_PIN_7, COLOR_ORDER>(leds[offset + 5], NUM_LEDS[offset + 5])
+  FastLED.addLeds<LED_TYPE, DATA_PIN_6, COLOR_ORDER>(leds[offset + 5], NUM_LEDS[offset + 5])
     .setCorrection(TypicalLEDStrip)
     .setDither(BRIGHTNESS < 255);
-  FastLED.addLeds<LED_TYPE, DATA_PIN_8, COLOR_ORDER>(leds[offset + 6], NUM_LEDS[offset + 6])
+  FastLED.addLeds<LED_TYPE, DATA_PIN_7, COLOR_ORDER>(leds[offset + 6], NUM_LEDS[offset + 6])
     .setCorrection(TypicalLEDStrip)
     .setDither(BRIGHTNESS < 255);
 
